@@ -1,0 +1,331 @@
+<!doctype html> 
+
+<!--
+ARI TESTER
+
+Copyright © 2016 Daniele Pallastrelli
+
+Permission is hereby granted, free of charge, to any person obtaining a 
+copy of this software and associated documentation files (the "Software"),
+to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell copies of the Software, and to permit persons to whom the 
+Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included 
+in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS 
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR 
+OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, 
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR 
+OTHER DEALINGS IN THE SOFTWARE.
+-->
+
+<html>
+<head>
+
+<title>ARI Tester</title> 
+
+<script> 
+
+"use strict"
+
+var tester = new Object;
+
+////////////////////////////////////////////////////////////////////////
+// ui functions
+
+function append(text) {
+  // document.getElementById("events").insertAdjacentHTML('beforeend', "<li>" + text + ";</li>" );
+}     
+
+function onLoad() {
+  // manage selection of channels
+  document.getElementById('channellist').onclick= function(e){
+    e= e || window.event;
+    var who= e.target || e.srcElement;
+    if(who.tagName== 'TD'){
+      if ( who.id != '' ) {
+        tester.currentCh = who.id;
+        append( 'current channel id = ' + who.id );
+        console.log( 'current channel id = ' + who.id );
+      }
+    }
+  }
+}
+
+function addChannelToView(channel) {
+  var table = document.getElementById("channellist");
+  var row = table.insertRow(1);
+  var cell1 = row.insertCell(0);
+  cell1.innerHTML = channel.id;
+  cell1.id = channel.id;
+  var cell2 = row.insertCell(1);
+  cell2.innerHTML = channel.name;
+  cell2.id = channel.id;
+  var cell3 = row.insertCell(2);
+  cell3.innerHTML = channel.state;
+  cell3.id = channel.id;
+}
+
+function removeChannelToView(id) {
+  var table = document.getElementById("channellist");
+  for ( var i = 1; i < table.rows.length; ++i ) {
+    var row = table.rows[i];
+    if ( row.cells[0].innerHTML == id ) {
+      table.deleteRow(i);
+      break;
+    }
+  }
+}
+
+function updateChannelView(channel) {
+  var id = channel.id;
+  var table = document.getElementById("channellist");
+  for ( var i = 1; i < table.rows.length; ++i ) {
+    var row = table.rows[i];
+    if ( row.cells[0].innerHTML == id ) {
+      row.cells[1].innerHTML = channel.name;        
+      row.cells[2].innerHTML = channel.state;
+      break;
+    }
+  }
+}
+
+////////////////////////////////////////////////////////////////////////
+// ari functions
+
+// http request
+function httpSend(act,cmd) {
+  var req = new XMLHttpRequest();
+  req.open( act, "http://"+tester.ip+"/ari/"+cmd, true, tester.user, tester.psw );
+  req.addEventListener("load", function(){
+    append("comando inviato");
+  });
+  req.send(null);
+}
+
+// subscribe for all SIP channel events:
+function subscribe() {
+  httpSend( 'POST', 'applications/'+tester.app+'/subscription?eventSource=endpoint:SIP' );
+}
+
+// find a channel in an event and return a descriptor of the channel
+function getChannelFromEvent( ev ) {
+  if ( ev.channel != null ) {
+    var ch = new Object;
+    ch.id = ev.channel.id;
+    ch.name = ev.channel.name;
+    ch.state = ev.channel.state;
+    return ch;
+  }
+  return null;
+}
+
+var eventActions = {
+   'ChannelCreated':  function(event) {
+     var channel = event.channel;
+     console.log( 'channel created: ' + channel.id + " " + channel.name + " " + channel.state );
+     addChannelToView( channel );
+   },
+   'ChannelDestroyed': function(event) {
+     var channel = event.channel;
+     console.log( 'channel destroyed: ' + channel.id + " " + channel.name + " " + channel.state );
+     removeChannelToView( channel.id );
+   },
+   'ChannelStateChange': function(event) {
+     var channel = event.channel;
+     console.log( 'channel state changed: ' + channel.id + " " + channel.name + " " + channel.state );
+     updateChannelView( channel );
+   }
+};
+
+function parseEvent(json) {
+  var event = JSON.parse(json);
+  console.log( event.type );
+  var action = eventActions[ event.type ];
+  if ( action != undefined ) action( event );
+}
+
+function doLogin() {
+  var ip = location.host;
+  var user = document.getElementById("username").value;
+  var psw = document.getElementById("secret").value;
+  var app = document.getElementById("application").value;
+
+  tester.ip = ip;
+  tester.user = user;
+  tester.psw = psw;
+  tester.app = app;
+
+  var service = new WebSocket('ws://'+ip+'/ari/events?api_key='+user+':'+psw+'&app='+app);
+  tester.socket = service;
+  service.onmessage = function(event){
+    append("messaggio ricevuto:")
+    append(event.data);
+    parseEvent(event.data);
+  } 
+  service.onopen = function(){
+    append("connessione effettuata");
+    subscribe();
+    document.getElementById("logoff").disabled=0;
+    document.getElementById("login").disabled=1;
+  } 
+  service.onclose = function(){
+    append("connessione chiusa");
+    document.getElementById("logoff").disabled=1;
+    document.getElementById("login").disabled=0;
+  } 
+  service.onerror = function(){
+    append("errore nella connessione");
+  }
+}
+
+function doLogoff() {
+  tester.socket.close();
+}
+
+function doHangup() {
+  if ( tester.currentCh != null ) {
+    httpSend( 'DELETE', 'channels/'+tester.currentCh );
+  }
+}
+
+function doAnswer() {
+  if ( tester.currentCh != null ) {
+    httpSend( 'POST', 'channels/'+tester.currentCh+'/answer' );
+  }
+}
+
+function doRing() {
+  if ( tester.currentCh != null ) {
+    httpSend( 'POST', 'channels/'+tester.currentCh+'/ring' );
+  }
+}
+
+function doStopRing() {
+  if ( tester.currentCh != null ) {
+    httpSend( 'DELETE', 'channels/'+tester.currentCh+'/ring' );
+  }
+}
+
+function doMute() {
+  if ( tester.currentCh != null ) {
+    httpSend( 'POST', 'channels/'+tester.currentCh+'/mute' );
+  }
+}
+
+function doUnMute() {
+  if ( tester.currentCh != null ) {
+    httpSend( 'DELETE', 'channels/'+tester.currentCh+'/mute' );
+  }
+}
+
+function doHold() {
+  if ( tester.currentCh != null ) {
+    httpSend( 'POST', 'channels/'+tester.currentCh+'/hold' );
+  }
+}
+
+function doUnHold() {
+  if ( tester.currentCh != null ) {
+    httpSend( 'DELETE', 'channels/'+tester.currentCh+'/hold' );
+  }
+}
+
+function doMoh() {
+  if ( tester.currentCh != null ) {
+    httpSend( 'POST', 'channels/'+tester.currentCh+'/moh' );
+  }
+}
+
+function doEndMoh() {
+  if ( tester.currentCh != null ) {
+    httpSend( 'DELETE', 'channels/'+tester.currentCh+'/moh' );
+  }
+}
+
+function doSilence() {
+  if ( tester.currentCh != null ) {
+    httpSend( 'POST', 'channels/'+tester.currentCh+'/silence' );
+  }
+}
+
+function doEndSilence() {
+  if ( tester.currentCh != null ) {
+    httpSend( 'DELETE', 'channels/'+tester.currentCh+'/silence' );
+  }
+}
+
+</script> 
+</head>
+
+<body onload="onLoad()"> 
+
+<table align="center" width=600>
+  
+  <tr valign="top">
+  <td>
+  <table align="left">
+    <tr><td colspan="2"><h2>Asterisk&trade; ARI Tester</h2></td></tr>
+    <tr><td>Username:</td><td><input id="username" value="asterisk"></td></tr>
+    <tr><td>Secret:</td><td><input type="password" id="secret" value="asterisk"></td></tr>
+    <tr><td>Application:</td><td><input id="application" value="attendant"></td></tr>
+    <tr><td colspan=2 align="center">
+    <div id="statusbar">
+    <span style="margin-left: 4px;font-weight:bold">&nbsp;</span>
+    </div>
+    </td></tr>
+    <tr>
+    <td><input type="submit" id="login" value="Login" onClick="doLogin()"></td>
+    <td><input type="submit" id="logoff" value="Logoff" disabled=1 onClick="doLogoff()"></td>
+    </tr>
+  </table>
+  </td>
+  <td valign='bottom'>
+  <table>
+    <div style="margin-left:10;margin-right:50;margin-top:10;margin-bottom:20">
+    <i>This is a tester of the ARI Asterisk REST API.  You can login with a
+    valid, appropriately permissioned username and secret and a stasis application.</i>
+    </div>
+    <tr>
+    <td><input type="submit" onClick="doRing()" id="ring" value="Ring"></td>
+    <td><input type="submit" onClick="doStopRing()" id="stopring" value="End Ring"></td>
+    <td><input type="submit" onClick="doMute()" id="mute" value="Mute"></td>
+    <td><input type="submit" onClick="doUnMute()" id="unmute" value="Unmute"></td>
+    <td><input type="submit" onClick="doHold()" id="hold" value="Hold"></td>
+    <td><input type="submit" onClick="doUnHold()" id="unhold" value="Unhold"></td>
+    <td><input type="submit" onClick="doMoh()" id="moh" value="Moh"></td>
+    <td><input type="submit" onClick="doEndMoh()" id="endmoh" value="End Moh"></td>
+    <td><input type="submit" onClick="doSilence()" id="silence" value="Silence"></td>
+    <td><input type="submit" onClick="doEndSilence()" id="endsilence" value="End Silence"></td>
+    <td><input type="submit" onClick="doAnswer()" id="answer" value="Answer"></td>
+    <td><input type="submit" onClick="doHangup()" id="hangup" value="Hangup"></td>
+    </tr>
+  </table>
+  </td>
+  </tr>
+  
+  <tr>
+  <td colspan=2>
+  <table id="channellist" border="1" width=500>
+    <tr><td><b>id</b></td><td><b>name</b></td><td><b>state</b></td></tr>
+  </table>
+  </td>
+  </tr>
+
+  <tr><td align="center" colspan=2><font size=-1><i>Copyright (C) Daniele Pallastrelli</i></font></td></tr>
+  
+</table>
+
+<ul id="events"></ul>
+
+</body>
+
+</html>
+
+
+
