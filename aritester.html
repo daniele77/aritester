@@ -39,7 +39,7 @@ var tester = new Object;
 // ui functions
 
 function append(text) {
-  //document.getElementById("events").insertAdjacentHTML('beforeend', "<li>" + text + ";</li>" );
+  document.getElementById("events").insertAdjacentHTML('beforeend', "<li>" + text + ";</li>" );
 }     
 
 function onLoad() {
@@ -188,9 +188,15 @@ function doLogoff() {
   tester.socket.close();
 }
 
+function getExtension() {
+  var ext = document.getElementById("ext").value;
+  if ( ext.indexOf('/') == -1 ) ext = "SIP/"+ext;
+  return ext; 
+}
 
 function doCreateChannel() {
-  httpSend( 'POST', 'channels?endpoint=SIP/101&app=attendant' );
+  var ext = getExtension();
+  httpSend( 'POST', 'channels?endpoint='+ext+'&app='+tester.app );
 }
 
 function doHangup() {
@@ -296,6 +302,7 @@ function doEndSilence() {
     <i>This is a tester of the ARI Asterisk REST API.  You can login with a
     valid, appropriately permissioned username and secret and a stasis application.</i>
     </div>
+<!--    
     <tr>
     <td><input type="submit" onClick="doCreateChannel()" id="createch" value="Create"></td>
     <td><input type="submit" onClick="doRing()" id="ring" value="Ring"></td>
@@ -311,6 +318,23 @@ function doEndSilence() {
     <td><input type="submit" onClick="doAnswer()" id="answer" value="Answer"></td>
     <td><input type="submit" onClick="doHangup()" id="hangup" value="Hangup"></td>
     </tr>
+-->
+    <br>
+    
+    <tr><td><input type="submit" onClick="doCreateChannel()" id="createch" value="Create"></td><td>Ext:</td><td><input id="ext" value="101"></td></tr>
+    <tr><td><input type="submit" onClick="doRing()" id="ring" value="Ring"></td></tr>
+    <tr><td><input type="submit" onClick="doStopRing()" id="stopring" value="End Ring"></td></tr>
+    <tr><td><input type="submit" onClick="doMute()" id="mute" value="Mute"></td></tr>
+    <tr><td><input type="submit" onClick="doUnMute()" id="unmute" value="Unmute"></td></tr>
+    <tr><td><input type="submit" onClick="doHold()" id="hold" value="Hold"></td></tr>
+    <tr><td><input type="submit" onClick="doUnHold()" id="unhold" value="Unhold"></td></tr>
+    <tr><td><input type="submit" onClick="doMoh()" id="moh" value="Moh"></td></tr>
+    <tr><td><input type="submit" onClick="doEndMoh()" id="endmoh" value="End Moh"></td></tr>
+    <tr><td><input type="submit" onClick="doSilence()" id="silence" value="Silence"></td></tr>
+    <tr><td><input type="submit" onClick="doEndSilence()" id="endsilence" value="End Silence"></td></tr>
+    <tr><td><input type="submit" onClick="doAnswer()" id="answer" value="Answer"></td></tr>
+    <tr><td><input type="submit" onClick="doHangup()" id="hangup" value="Hangup"></td></tr> 
+     
   </table>
   </td>
   </tr>
