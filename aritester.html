@@ -39,7 +39,7 @@ var tester = new Object;
 // ui functions
 
 function append(text) {
-  // document.getElementById("events").insertAdjacentHTML('beforeend', "<li>" + text + ";</li>" );
+  //document.getElementById("events").insertAdjacentHTML('beforeend', "<li>" + text + ";</li>" );
 }     
 
 function onLoad() {
@@ -50,7 +50,6 @@ function onLoad() {
     if(who.tagName== 'TD'){
       if ( who.id != '' ) {
         tester.currentCh = who.id;
-        append( 'current channel id = ' + who.id );
         console.log( 'current channel id = ' + who.id );
       }
     }
@@ -101,9 +100,11 @@ function updateChannelView(channel) {
 // http request
 function httpSend(act,cmd) {
   var req = new XMLHttpRequest();
-  req.open( act, "http://"+tester.ip+"/ari/"+cmd, true, tester.user, tester.psw );
+  var url = "http://"+tester.ip+"/ari/"+cmd;
+  console.log( "requesting: " + act + " " + url );
+  req.open( act, url, true, tester.user, tester.psw );
   req.addEventListener("load", function(){
-    append("comando inviato");
+    console.log( 'http ' + act + ' sent' );
   });
   req.send(null);
 }
@@ -164,28 +165,32 @@ function doLogin() {
   var service = new WebSocket('ws://'+ip+'/ari/events?api_key='+user+':'+psw+'&app='+app);
   tester.socket = service;
   service.onmessage = function(event){
-    append("messaggio ricevuto:")
     append(event.data);
     parseEvent(event.data);
   } 
   service.onopen = function(){
-    append("connessione effettuata");
+    append("Connected");
     subscribe();
     document.getElementById("logoff").disabled=0;
     document.getElementById("login").disabled=1;
   } 
   service.onclose = function(){
-    append("connessione chiusa");
+    append("Disconnected");
     document.getElementById("logoff").disabled=1;
     document.getElementById("login").disabled=0;
   } 
   service.onerror = function(){
-    append("errore nella connessione");
+    append("Connection error");
   }
 }
 
 function doLogoff() {
   tester.socket.close();
+}
+
+
+function doCreateChannel() {
+  httpSend( 'POST', 'channels?endpoint=SIP/101&app=attendant' );
 }
 
 function doHangup() {
@@ -292,6 +297,7 @@ function doEndSilence() {
     valid, appropriately permissioned username and secret and a stasis application.</i>
     </div>
     <tr>
+    <td><input type="submit" onClick="doCreateChannel()" id="createch" value="Create"></td>
     <td><input type="submit" onClick="doRing()" id="ring" value="Ring"></td>
     <td><input type="submit" onClick="doStopRing()" id="stopring" value="End Ring"></td>
     <td><input type="submit" onClick="doMute()" id="mute" value="Mute"></td>
