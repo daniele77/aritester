@@ -39,7 +39,7 @@ var tester = new Object;
 // ui functions
 
 function append(text) {
-  document.getElementById("events").insertAdjacentHTML('beforeend', "<li>" + text + ";</li>" );
+  //document.getElementById("events").insertAdjacentHTML('beforeend', "<li>" + text + ";</li>" );
 }     
 
 function onLoad() {
@@ -55,6 +55,8 @@ function onLoad() {
     }
   }
 }
+
+// channels view
 
 function addChannelToView(channel) {
   var table = document.getElementById("channellist");
@@ -94,6 +96,49 @@ function updateChannelView(channel) {
   }
 }
 
+// bridges view
+
+function addBridgeToView(bridge) {
+  var table = document.getElementById("bridgelist");
+  var row = table.insertRow(1);
+  var cell1 = row.insertCell(0);
+  cell1.innerHTML = bridge.id;
+  cell1.id = bridge.id;
+  var cell2 = row.insertCell(1);
+  cell2.innerHTML = bridge.technology;
+  cell2.id = bridge.id;
+  var cell3 = row.insertCell(2);
+  cell3.innerHTML = bridge.bridge_type;
+  cell3.id = bridge.id;
+  var cell4 = row.insertCell(3);
+  cell4.innerHTML = bridge.channels.join( '\n' );
+  cell4.id = bridge.id;
+}
+
+function removeBridgeToView(id) {
+  var table = document.getElementById("bridgelist");
+  for ( var i = 1; i < table.rows.length; ++i ) {
+    var row = table.rows[i];
+    if ( row.cells[0].innerHTML == id ) {
+      table.deleteRow(i);
+      break;
+    }
+  }
+}
+
+function updateBridgeView(bridge) {
+  var id = bridge.id;
+  var table = document.getElementById("bridgelist");
+  for ( var i = 1; i < table.rows.length; ++i ) {
+    var row = table.rows[i];
+    if ( row.cells[0].innerHTML == id ) {
+      row.cells[2].innerHTML = bridge.bridge_type;
+      row.cells[3].innerHTML = bridge.channels.join( '\n' );
+      break;
+    }
+  }
+}
+
 ////////////////////////////////////////////////////////////////////////
 // ari functions
 
@@ -105,13 +150,21 @@ function httpSend(act,cmd) {
   req.open( act, url, true, tester.user, tester.psw );
   req.addEventListener("load", function(){
     console.log( 'http ' + act + ' sent' );
+    append( req.responseText );
+  });
+  req.addEventListener("error", function(){
+    console.log( 'http ' + act + ' error' );
+    append( 'http ' + act + ' error' );
   });
   req.send(null);
 }
 
 // subscribe for all SIP channel events:
 function subscribe() {
-  httpSend( 'POST', 'applications/'+tester.app+'/subscription?eventSource=endpoint:SIP' );
+  //httpSend( 'POST', 'applications/'+tester.app+'/subscription?eventSource=endpoint:SIP' );
+  
+  // subscribe for all events from channels,endpoint,bridge and devices source
+  httpSend( 'POST', 'applications/'+tester.app+'/subscription?eventSource=channel:,endpoint:,bridge:,deviceState:' );
 }
 
 // find a channel in an event and return a descriptor of the channel
@@ -141,6 +194,26 @@ var eventActions = {
      var channel = event.channel;
      console.log( 'channel state changed: ' + channel.id + " " + channel.name + " " + channel.state );
      updateChannelView( channel );
+   },
+   'BridgeCreated': function(event) {
+     var bridge = event.bridge;
+     console.log( 'bridge created: ' + bridge.id + " " + bridge.technology + " " + bridge.bridge_type );
+     addBridgeToView( bridge );
+   },
+   'BridgeDestroyed': function(event) {
+     var bridge = event.bridge;
+     console.log( 'bridge destroyed: ' + bridge.id + " " + bridge.technology + " " + bridge.bridge_type );
+     removeBridgeToView( bridge.id );
+   },
+   'ChannelEnteredBridge': function(event) {
+     var bridge = event.bridge;
+     console.log( 'channel entered bridge: ' + bridge.id + " " + event.channel.name );
+     updateBridgeView( bridge );
+   },
+   'ChannelLeftBridge': function(event) {
+     var bridge = event.bridge;
+     console.log( 'channel left bridge: ' + bridge.id + " " + event.channel.name );
+     updateBridgeView( bridge );
    }
 };
 
@@ -162,7 +235,7 @@ function doLogin() {
   tester.psw = psw;
   tester.app = app;
 
-  var service = new WebSocket('ws://'+ip+'/ari/events?api_key='+user+':'+psw+'&app='+app);
+  var service = new WebSocket('ws://'+ip+'/ari/events?api_key='+user+':'+psw+'&app='+app+'&subscribeAll=true');
   tester.socket = service;
   service.onmessage = function(event){
     append(event.data);
@@ -194,9 +267,21 @@ function getExtension() {
   return ext; 
 }
 
+function getDTMF() {
+  var dtmf = document.getElementById("dtmf").value;
+  return dtmf; 
+}
+
 function doCreateChannel() {
   var ext = getExtension();
   httpSend( 'POST', 'channels?endpoint='+ext+'&app='+tester.app );
+}
+
+function doDTMF() {
+  if ( tester.currentCh != null ) {
+    var dtmf = getDTMF();
+    httpSend( 'POST', 'channels/'+tester.currentCh+'/dtmf?dtmf='+dtmf );
+  }
 }
 
 function doHangup() {
@@ -271,6 +356,12 @@ function doEndSilence() {
   }
 }
 
+function doSnoop() {
+  if ( tester.currentCh != null ) {
+    httpSend( 'POST', 'channels/'+tester.currentCh+'/snoop?app='+tester.app+'&spy=both' );
+  }
+}
+
 </script> 
 </head>
 
@@ -302,26 +393,11 @@ function doEndSilence() {
     <i>This is a tester of the ARI Asterisk REST API.  You can login with a
     valid, appropriately permissioned username and secret and a stasis application.</i>
     </div>
-<!--    
-    <tr>
-    <td><input type="submit" onClick="doCreateChannel()" id="createch" value="Create"></td>
-    <td><input type="submit" onClick="doRing()" id="ring" value="Ring"></td>
-    <td><input type="submit" onClick="doStopRing()" id="stopring" value="End Ring"></td>
-    <td><input type="submit" onClick="doMute()" id="mute" value="Mute"></td>
-    <td><input type="submit" onClick="doUnMute()" id="unmute" value="Unmute"></td>
-    <td><input type="submit" onClick="doHold()" id="hold" value="Hold"></td>
-    <td><input type="submit" onClick="doUnHold()" id="unhold" value="Unhold"></td>
-    <td><input type="submit" onClick="doMoh()" id="moh" value="Moh"></td>
-    <td><input type="submit" onClick="doEndMoh()" id="endmoh" value="End Moh"></td>
-    <td><input type="submit" onClick="doSilence()" id="silence" value="Silence"></td>
-    <td><input type="submit" onClick="doEndSilence()" id="endsilence" value="End Silence"></td>
-    <td><input type="submit" onClick="doAnswer()" id="answer" value="Answer"></td>
-    <td><input type="submit" onClick="doHangup()" id="hangup" value="Hangup"></td>
-    </tr>
--->
+
     <br>
     
     <tr><td><input type="submit" onClick="doCreateChannel()" id="createch" value="Create"></td><td>Ext:</td><td><input id="ext" value="101"></td></tr>
+    <tr><td><input type="submit" onClick="doDTMF()" id="senddtmf" value="DTMF"></td><td>DTMF:</td><td><input id="dtmf" value="*"></td></tr>
     <tr><td><input type="submit" onClick="doRing()" id="ring" value="Ring"></td></tr>
     <tr><td><input type="submit" onClick="doStopRing()" id="stopring" value="End Ring"></td></tr>
     <tr><td><input type="submit" onClick="doMute()" id="mute" value="Mute"></td></tr>
@@ -333,18 +409,27 @@ function doEndSilence() {
     <tr><td><input type="submit" onClick="doSilence()" id="silence" value="Silence"></td></tr>
     <tr><td><input type="submit" onClick="doEndSilence()" id="endsilence" value="End Silence"></td></tr>
     <tr><td><input type="submit" onClick="doAnswer()" id="answer" value="Answer"></td></tr>
-    <tr><td><input type="submit" onClick="doHangup()" id="hangup" value="Hangup"></td></tr> 
+    <tr><td><input type="submit" onClick="doHangup()" id="hangup" value="Hangup"></td></tr>     
+    <tr><td><input type="submit" onClick="doSnoop()" id="snoop" value="Snoop"></td></tr> 
      
   </table>
   </td>
   </tr>
   
   <tr>
-  <td colspan=2>
+  <!--td colspan=2-->
+  <td>
   <table id="channellist" border="1" width=500>
     <tr><td><b>id</b></td><td><b>name</b></td><td><b>state</b></td></tr>
   </table>
   </td>
+  
+  <td>
+  <table id="bridgelist" border="1" width=500>
+    <tr><td><b>id</b></td><td><b>technology</b></td><td><b>type</b></td><td><b>channels</b></td></tr>
+  </table>
+  </td>
+
   </tr>
 
   <tr><td align="center" colspan=2><font size=-1><i>Copyright (C) Daniele Pallastrelli</i></font></td></tr>
