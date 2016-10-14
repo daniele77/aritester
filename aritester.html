@@ -314,7 +314,18 @@ function getDTMF() {
 
 function doCreateChannel() {
   var ext = getExtension();
+  httpSend( 'POST', 'channels/create?endpoint='+ext+'&app='+tester.app );
+}
+
+function doCreateChAndOriginate() {
+  var ext = getExtension();
   httpSend( 'POST', 'channels?endpoint='+ext+'&app='+tester.app );
+}
+
+function doDialCh() {
+  if ( tester.currentCh != null ) {
+    httpSend( 'POST', 'channels/'+tester.currentCh+'/dial' );
+  }
 }
 
 function doDTMF() {
@@ -402,6 +413,12 @@ function doSnoop() {
   }
 }
 
+function doRedirect() {
+  if ( tester.currentCh != null ) {
+    httpSend( 'POST', 'channels/'+tester.currentCh+'/redirect?endpoint='+getExtension() );
+  }
+}
+
 // bridge functions
 
 function doCreateBridge() {
@@ -485,6 +502,7 @@ function doStopMohBridge() {
     <td>
       <table>    
         <tr><td><input type="submit" onClick="doCreateChannel()" id="createch" value="Create"></td><td>Ext:</td><td><input id="ext" value="101"></td></tr>
+        <tr><td><input type="submit" onClick="doCreateChAndOriginate()" id="createchorig" value="Create And Dial"></td></tr>
         <tr><td><input type="submit" onClick="doDTMF()" id="senddtmf" value="DTMF"></td><td>DTMF:</td><td><input id="dtmf" value="*"></td></tr>
         <tr><td><input type="submit" onClick="doRing()" id="ring" value="Ring"></td></tr>
         <tr><td><input type="submit" onClick="doStopRing()" id="stopring" value="End Ring"></td></tr>
@@ -499,6 +517,8 @@ function doStopMohBridge() {
         <tr><td><input type="submit" onClick="doAnswer()" id="answer" value="Answer"></td></tr>
         <tr><td><input type="submit" onClick="doHangup()" id="hangup" value="Hangup"></td></tr>     
         <tr><td><input type="submit" onClick="doSnoop()" id="snoop" value="Snoop"></td></tr>       
+        <tr><td><input type="submit" onClick="doDialCh()" id="dialch" value="Dial"></td></tr>
+        <tr><td><input type="submit" onClick="doRedirect()" id="redirect" value="Redirect"></td></tr>
       </table>
     </td>
     <td>
