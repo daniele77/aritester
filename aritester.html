@@ -405,7 +405,8 @@ function doSnoop() {
 // bridge functions
 
 function doCreateBridge() {
-  httpSend( 'POST', 'bridges' );
+  var type = document.getElementById("bridgetype").value;
+  httpSend( 'POST', 'bridges?type='+type );
 }
 
 function doDeleteBridge() {
@@ -416,7 +417,8 @@ function doDeleteBridge() {
 
 function doAddChToBridge() {
   if ( tester.currentBridge != null && tester.currentCh != null ) {
-    httpSend( 'POST', 'bridges/'+tester.currentBridge+'/addChannel?channel='+tester.currentCh );
+    var role = document.getElementById("chrole").value;
+    httpSend( 'POST', 'bridges/'+tester.currentBridge+'/addChannel?channel='+tester.currentCh+'&role='+role );
   }
 }
 
@@ -501,9 +503,30 @@ function doStopMohBridge() {
     </td>
     <td>
       <table>    
-        <tr><td><input type="submit" onClick="doCreateBridge()" id="createbridge" value="Create"></td></tr>
+        <tr>
+          <td><input type="submit" onClick="doCreateBridge()" id="createbridge" value="Create"></td>
+          <td>Type:</td>
+          <td>
+            <select id="bridgetype" name="bridgetype">
+              <option value="mixing" selected="selected">mixing</option>
+              <option value="holding">holding</option>
+              <option value="dtmf_events">dtmf_events</option>
+              <option value="proxy_media">proxy_media</option>
+            </select>
+          </td>
+
+        </tr>
         <tr><td><input type="submit" onClick="doDeleteBridge()" id="deletebridge" value="Delete"></td></tr>
-        <tr><td><input type="submit" onClick="doAddChToBridge()" id="addchtobridge" value="Add channel"></td></tr>
+        <tr>
+          <td><input type="submit" onClick="doAddChToBridge()" id="addchtobridge" value="Add channel"></td>
+          <td>Role:</td>
+          <td>
+            <select id="chrole" name="chrole">
+              <option value="partecipant" selected="selected">partecipant</option>
+              <option value="announcer">announcer</option>
+            </select>
+          </td>
+        </tr>
         <tr><td><input type="submit" onClick="doRemoveChFromBridge()" id="removechfrombridge" value="Remove channel"></td></tr>
         <tr><td><input type="submit" onClick="doMohBridge()" id="addmohtobridge" value="Moh"></td></tr>
         <tr><td><input type="submit" onClick="doStopMohBridge()" id="stopmohfrombridge" value="Stop Moh"></td></tr>
