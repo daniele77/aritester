@@ -433,18 +433,17 @@ function doDial() {
   httpSend( 'POST', 'channels?endpoint=SIP/'+from+'&extension='+to+"&context="+context+"&callerId="+from );
 }
 
-function doStopMohBridge() {
+function doMohBridge() {
   if ( tester.currentBridge != null ) {
     httpSend( 'POST', 'bridges/'+tester.currentBridge+'/moh' );
   }
 }
 
-function doMohBridge() {
+function doStopMohBridge() {
   if ( tester.currentBridge != null ) {
     httpSend( 'DELETE', 'bridges/'+tester.currentBridge+'/moh' );
   }
 }
-
 
 </script> 
 </head>
