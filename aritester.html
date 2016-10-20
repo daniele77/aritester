@@ -484,8 +484,8 @@ function doStopMohBridge() {
     </div>
     </td></tr>
     <tr>
-    <td><input type="submit" id="login" value="Login" onClick="doLogin()"></td>
-    <td><input type="submit" id="logoff" value="Logoff" disabled=1 onClick="doLogoff()"></td>
+    <td><button onClick="doLogin()" id="login">Login</button></td>
+    <td><button id="logoff" disabled=1 onClick="doLogoff()">Logoff</button></td>
     </tr>
   </table>
   </td>
@@ -501,30 +501,30 @@ function doStopMohBridge() {
     <td></td>
     <td>
       <table>    
-        <tr><td><input type="submit" onClick="doCreateChannel()" id="createch" value="Create"></td><td>Ext:</td><td><input id="ext" value="101"></td></tr>
-        <tr><td><input type="submit" onClick="doCreateChAndOriginate()" id="createchorig" value="Create And Dial"></td></tr>
-        <tr><td><input type="submit" onClick="doDTMF()" id="senddtmf" value="DTMF"></td><td>DTMF:</td><td><input id="dtmf" value="*"></td></tr>
-        <tr><td><input type="submit" onClick="doRing()" id="ring" value="Ring"></td></tr>
-        <tr><td><input type="submit" onClick="doStopRing()" id="stopring" value="End Ring"></td></tr>
-        <tr><td><input type="submit" onClick="doMute()" id="mute" value="Mute"></td></tr>
-        <tr><td><input type="submit" onClick="doUnMute()" id="unmute" value="Unmute"></td></tr>
-        <tr><td><input type="submit" onClick="doHold()" id="hold" value="Hold"></td></tr>
-        <tr><td><input type="submit" onClick="doUnHold()" id="unhold" value="Unhold"></td></tr>
-        <tr><td><input type="submit" onClick="doMoh()" id="moh" value="Moh"></td></tr>
-        <tr><td><input type="submit" onClick="doEndMoh()" id="endmoh" value="End Moh"></td></tr>
-        <tr><td><input type="submit" onClick="doSilence()" id="silence" value="Silence"></td></tr>
-        <tr><td><input type="submit" onClick="doEndSilence()" id="endsilence" value="End Silence"></td></tr>
-        <tr><td><input type="submit" onClick="doAnswer()" id="answer" value="Answer"></td></tr>
-        <tr><td><input type="submit" onClick="doHangup()" id="hangup" value="Hangup"></td></tr>     
-        <tr><td><input type="submit" onClick="doSnoop()" id="snoop" value="Snoop"></td></tr>       
-        <tr><td><input type="submit" onClick="doDialCh()" id="dialch" value="Dial"></td></tr>
-        <tr><td><input type="submit" onClick="doRedirect()" id="redirect" value="Redirect"></td></tr>
+        <tr><td><button onClick="doCreateChannel()" id="createch">Create</button></td><td>Ext:</td><td><input id="ext" value="101"></td></tr>
+        <tr><td><button onClick="doCreateChAndOriginate()" id="createchorig">Create And Dial</button></td></tr>
+        <tr><td><button onClick="doDTMF()" id="senddtmf">DTMF</button></td><td>DTMF:</td><td><input id="dtmf" value="*"></td></tr>
+        <tr><td><button onClick="doRing()" id="ring">Ring</button></td></tr>
+        <tr><td><button onClick="doStopRing()" id="stopring">End Ring</button></td></tr>
+        <tr><td><button onClick="doMute()" id="mute">Mute</button></td></tr>
+        <tr><td><button onClick="doUnMute()" id="unmute">Unmute</button></td></tr>
+        <tr><td><button onClick="doHold()" id="hold">Hold</button></td></tr>
+        <tr><td><button onClick="doUnHold()" id="unhold">Unhold</button></td></tr>
+        <tr><td><button onClick="doMoh()" id="moh">Moh</button></td></tr>
+        <tr><td><button onClick="doEndMoh()" id="endmoh">End Moh</button></td></tr>
+        <tr><td><button onClick="doSilence()" id="silence">Silence</button></td></tr>
+        <tr><td><button onClick="doEndSilence()" id="endsilence">End Silence</button></td></tr>
+        <tr><td><button onClick="doAnswer()" id="answer">Answer</button></td></tr>
+        <tr><td><button onClick="doHangup()" id="hangup">Hangup</button></td></tr>     
+        <tr><td><button onClick="doSnoop()" id="snoop">Snoop</button></td></tr>       
+        <tr><td><button onClick="doDialCh()" id="dialch">Dial</button></td></tr>
+        <tr><td><button onClick="doRedirect()" id="redirect">Redirect</button></td></tr>
       </table>
     </td>
     <td>
       <table>    
         <tr>
-          <td><input type="submit" onClick="doCreateBridge()" id="createbridge" value="Create"></td>
+          <td><button onClick="doCreateBridge()" id="createbridge">Create</button></td>
           <td>Type:</td>
           <td>
             <select id="bridgetype" name="bridgetype">
@@ -536,9 +536,9 @@ function doStopMohBridge() {
           </td>
 
         </tr>
-        <tr><td><input type="submit" onClick="doDeleteBridge()" id="deletebridge" value="Delete"></td></tr>
+        <tr><td><button onClick="doDeleteBridge()" id="deletebridge">Delete</button></td></tr>
         <tr>
-          <td><input type="submit" onClick="doAddChToBridge()" id="addchtobridge" value="Add channel"></td>
+          <td><button onClick="doAddChToBridge()" id="addchtobridge">Add Channel</button></td>
           <td>Role:</td>
           <td>
             <select id="chrole" name="chrole">
@@ -547,11 +547,11 @@ function doStopMohBridge() {
             </select>
           </td>
         </tr>
-        <tr><td><input type="submit" onClick="doRemoveChFromBridge()" id="removechfrombridge" value="Remove channel"></td></tr>
-        <tr><td><input type="submit" onClick="doMohBridge()" id="addmohtobridge" value="Moh"></td></tr>
-        <tr><td><input type="submit" onClick="doStopMohBridge()" id="stopmohfrombridge" value="Stop Moh"></td></tr>
+        <tr><td><button onClick="doRemoveChFromBridge()" id="removechfrombridge">Remove channel</button></td></tr>
+        <tr><td><button onClick="doMohBridge()" id="addmohtobridge">Moh</button></td></tr>
+        <tr><td><button onClick="doStopMohBridge()" id="stopmohfrombridge">Stop Moh</button></td></tr>
         <tr>
-          <td><input type="submit" onClick="doDial()" id="dial" value="Dial"></td>
+          <td><button onClick="doDial()" id="dial">Dial</button></td>
           <td>From:</td><td><input id="from" value="101"></td>
           <td>To:</td><td><input id="to" value="290"></td>
           <td>Context:</td><td><input id="context" value="LocalSets"></td></tr>
