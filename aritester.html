@@ -31,12 +31,19 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 <style>
 
+body {
+  /*background: #eeeeee;*/
+  font-family: "Trebuchet MS", Verdana, Arial, serif;
+}
+
+
 .flex-container {
   display: -webkit-flex;
   display: flex;
   -webkit-flex-flow: row wrap;
   flex-flow: row wrap;
 /*  text-align: center;*/
+  align-items: stretch;
 }
 
 .flex-container > * {
@@ -54,18 +61,20 @@ OTHER DEALINGS IN THE SOFTWARE.
 header {background: black;color:white;}
 footer {background: #aaa;color:white;}
 .loginbox {background:#eee;}
-
+  
 .loginbox {
-  order: 1;
-  flex: 0 0 auto;
-}
-.descriptionbox {
   order: 2;
   flex: 0 0 auto;
+  height: 250px;
+}
+.descriptionbox {
+//  order: 1;
+//  flex: 0 0 auto;
   text-align: left;
   font-style: italic;
   width: 250px;
   height: 100px;
+  margin: 20px 0px 20px 0px;
 }
 #btncmdsbox {
   order: 3;
@@ -81,17 +90,18 @@ footer {background: #aaa;color:white;}
 }
 #eventbox {
   order: 6;
+  //flex: 1 0 auto;
 
-  width: 600px;
-  height: 100px;
+  height: 200px;
   border-top: 1px solid #eee;
   border-left: 1px solid #eee;
   border-bottom: 1px solid #eee;
-  padding: 10px; 
+  border-right: 1px solid #eee;
+  //padding: 10px; 
   font-size: 80%;
   overflow: auto;
   background-color: white;
-  margin: 20px 5px 20px 5px;
+  margin: 20px 0px 20px 0px;
 }
 footer {
   order: 7;
@@ -112,6 +122,10 @@ table {
   text-align: left;
 }
 
+.tablebox {
+  height: 150px;
+  padding: 15px 0px 15px 0px;
+}
 
 
 /*
@@ -580,20 +594,21 @@ function doStopMohBridge() {
   </header>
 
   <div class="loginbox">
+
+    <div class="descriptionbox">
+      This is a tester of the ARI Asterisk REST API.  You can login with a
+      valid, appropriately permissioned username and secret and a stasis application.
+    </div>
+
     <table>
       <tr><td>Username:</td><td><input id="username" value="asterisk"></td></tr>
       <tr><td>Secret:</td><td><input type="password" id="secret" value="asterisk"></td></tr>
       <tr><td>Application:</td><td><input id="application" value="attendant"></td></tr>
       <tr>
-      <td><button id="login" onClick="doLogin()">Login</button></td>
-      <td><button id="logoff" disabled=1 onClick="doLogoff()">Logoff</button></td>
+        <td><button id="login" onClick="doLogin()">Login</button></td>
+        <td><button id="logoff" disabled=1 onClick="doLogoff()">Logoff</button></td>
       </tr>
     </table>    
-  </div>
-
-  <div class="descriptionbox">
-    This is a tester of the ARI Asterisk REST API.  You can login with a
-    valid, appropriately permissioned username and secret and a stasis application.
   </div>
 
   <div id="btncmdsbox" class="cmdsbox">
@@ -618,9 +633,11 @@ function doStopMohBridge() {
       <tr><td><button onClick="doRedirect()" id="redirect">Redirect</button></td></tr>
     </table>
     
-    <table id="channellist" border="1" width=500>
+    <div class="tablebox">
+    <table id="channellist" class="table" border="1" width=500>
       <tr><th>Id</th><th>Name</th><th>State</th></tr>
     </table>
+    </div>
 
   </div>    
 
@@ -660,13 +677,15 @@ function doStopMohBridge() {
         <td>Context:</td><td><input id="context" value="LocalSets"></td></tr>
     </table>
     
-    <table id="bridgelist" border="1" width=500>
+    <div class="tablebox">
+    <table id="bridgelist" class="table" border="1" width=500>
       <tr><th>Id</th><th>Technology</th><th>Type</th><th>Channels</th></tr>
     </table>
+    </div>
 
   </div>
   
-  <div id="devicebox">
+  <div id="devicebox" class="tablebox">
     <table id="devicelist" border="1" width=300>
       <tr><th>Name</th><th>State</th></tr>
     </table> 
