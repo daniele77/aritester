@@ -104,6 +104,12 @@ footer {background: #aaa; color: white;}
   background-color: white;
   margin: 20px 0px 20px 0px;
 }
+#eventbox ul {
+  list-style: none;
+  //margin-left: 0;
+  padding-left: 2px;
+  //width: 10em;
+}
 footer {
   order: 7;
 }
@@ -112,8 +118,9 @@ footer {
   padding: 15px;
 }
 .cmdsbox button {
-  width: 150px;
+  width: 150px;  
 }
+.cmdsbox button:hover { background: #c1c1c1; }
 .cmdsbox input {
   width: 100px;
 }
@@ -125,6 +132,7 @@ footer {
   list-style: none;
   //margin-left: 0;
   padding-left: 0;
+  //width: 10em;
 }
 
 table {
@@ -705,8 +713,8 @@ function doStopMohBridge() {
         
   </div>
   
-  <div id="bridgecmdsbox" class="cmdsbox">
-    <div id="devicebox" class="tablebox">
+  <div id="devicebox" class="cmdsbox">
+    <div class="tablebox">
       <table id="devicelist" border="1" width=300>
         <tr><th>Name</th><th>State</th></tr>
       </table> 
