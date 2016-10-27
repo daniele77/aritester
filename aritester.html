@@ -122,6 +122,10 @@ table {
   text-align: left;
 }
 
+.rowselected { background-color: #e6eef4; }
+.rowunselected { background-color: white; }
+th { background-color: grey; color: white; }
+
 .tablebox {
   height: 150px;
   padding: 15px 0px 15px 0px;
@@ -163,10 +167,27 @@ function append(text) {
 function onLoad() {
   // manage selection of channels
   document.getElementById('channellist').onclick= function(e){
-    e= e || window.event;
+    e = e || window.event;
     var who= e.target || e.srcElement;
-    if(who.tagName== 'TD'){
-      if ( who.id != '' ) {
+    if( who.tagName== 'TD' && who.id != '' ) {
+      if ( tester.currentCh == null ) { // no previous selection
+        // just select
+        who.parentNode.className = "rowselected";
+        tester.currentCh = who.id;
+        console.log( 'current channel id = ' + who.id );
+      } else if ( tester.currentCh == who.id ) { // same selection
+        // remove selection
+        who.parentNode.className = "rowunselected";        
+        tester.currentCh = null;
+        console.log( 'reset channel selection' );
+      }
+      else { // other selection
+        // unselect previous
+        var previous = document.getElementById( tester.currentCh );
+        if ( previous != null )
+          previous.parentNode.className = "rowunselected";
+        // select new
+        who.parentNode.className = "rowselected";
         tester.currentCh = who.id;
         console.log( 'current channel id = ' + who.id );
       }
@@ -174,10 +195,27 @@ function onLoad() {
   }
   // manage selection of bridges
   document.getElementById('bridgelist').onclick= function(e){
-    e= e || window.event;
+    e = e || window.event;
     var who= e.target || e.srcElement;
-    if(who.tagName== 'TD'){
-      if ( who.id != '' ) {
+    if( who.tagName== 'TD' && who.id != '' ) {
+      if ( tester.currentBridge == null ) { // no previous selection
+        // just select
+        who.parentNode.className = "rowselected";
+        tester.currentBridge = who.id;
+        console.log( 'current bridge id = ' + who.id );
+      } else if ( tester.currentBridge == who.id ) { // same selection
+        // remove selection
+        who.parentNode.className = "rowunselected";        
+        tester.currentBridge = null;
+        console.log( 'reset bridge selection' );
+      }
+      else { // other selection
+        // unselect previous
+        var previous = document.getElementById( tester.currentBridge );
+        if ( previous != null )
+          previous.parentNode.className = "rowunselected";
+        // select new
+        who.parentNode.className = "rowselected";
         tester.currentBridge = who.id;
         console.log( 'current bridge id = ' + who.id );
       }
