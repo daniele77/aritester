@@ -160,150 +160,113 @@ var tester = new Object;
 ////////////////////////////////////////////////////////////////////////
 // ui functions
 
+// Table class
+
+function Table(id,desc) {
+  this.table = document.getElementById(id);
+  this.description = desc; // descriptive name of the table
+  this.selection = null; // element own id
+  
+  var self = this;
+  this.table.onclick=function(e) {
+    e = e || window.event;
+    var who = e.target || e.srcElement;
+    if( who.tagName== 'TD' && who.id != '' ) {
+      if ( self.selection == null ) { // no previous selection
+        // just select
+        who.parentNode.className = "rowselected";
+        self.selection = who.id;
+        console.log( 'current '+self.description+' id = '+who.id );
+      } else if ( self.selection == who.id ) { // same selection
+        // remove selection
+        who.parentNode.className = "rowunselected";        
+        self.selection = null;
+        console.log( 'reset '+self.description+' selection' );
+      }
+      else { // other selection
+        // unselect previous
+        var previous = document.getElementById( self.selection );
+        if ( previous != null )
+          previous.parentNode.className = "rowunselected";
+        // select new
+        who.parentNode.className = "rowselected";
+        self.selection = who.id;
+        console.log( 'current '+self.description+' id = '+who.id );
+      }
+    }
+  }
+}
+
+Table.prototype.addRow = function(id,data) {  
+  var row = this.table.insertRow(1);
+  for ( var i = 0; i < data.length; ++i ) {
+    var cell = row.insertCell(i);
+    cell.innerHTML = data[i];
+    cell.id = id;
+  }
+}
+
+Table.prototype.removeRow = function(id) {
+  for ( var i = 1; i < this.table.rows.length; ++i ) {
+    var row = this.table.rows[i];
+    if ( row.cells[0].innerHTML == id ) {
+      this.table.deleteRow(i);
+      break;
+    }
+  }
+}
+
+Table.prototype.updateRow = function(id,data) {
+  for ( var i = 1; i < this.table.rows.length; ++i ) {
+    var row = this.table.rows[i];
+    if ( row.cells[0].id == id ) {      
+      for ( var i = 0; i < data.length; ++i )
+        row.cells[i].innerHTML = data[i];
+      break;
+    }
+  }
+}
+
+// end Table class
+
 function append(text) {
   document.getElementById("events").insertAdjacentHTML('beforeend', "<li>" + text + ";</li>" );
-}     
+}
+
+var chTable;
+var bridgeTable;
 
 function onLoad() {
-  // manage selection of channels
-  document.getElementById('channellist').onclick= function(e){
-    e = e || window.event;
-    var who= e.target || e.srcElement;
-    if( who.tagName== 'TD' && who.id != '' ) {
-      if ( tester.currentCh == null ) { // no previous selection
-        // just select
-        who.parentNode.className = "rowselected";
-        tester.currentCh = who.id;
-        console.log( 'current channel id = ' + who.id );
-      } else if ( tester.currentCh == who.id ) { // same selection
-        // remove selection
-        who.parentNode.className = "rowunselected";        
-        tester.currentCh = null;
-        console.log( 'reset channel selection' );
-      }
-      else { // other selection
-        // unselect previous
-        var previous = document.getElementById( tester.currentCh );
-        if ( previous != null )
-          previous.parentNode.className = "rowunselected";
-        // select new
-        who.parentNode.className = "rowselected";
-        tester.currentCh = who.id;
-        console.log( 'current channel id = ' + who.id );
-      }
-    }
-  }
-  // manage selection of bridges
-  document.getElementById('bridgelist').onclick= function(e){
-    e = e || window.event;
-    var who= e.target || e.srcElement;
-    if( who.tagName== 'TD' && who.id != '' ) {
-      if ( tester.currentBridge == null ) { // no previous selection
-        // just select
-        who.parentNode.className = "rowselected";
-        tester.currentBridge = who.id;
-        console.log( 'current bridge id = ' + who.id );
-      } else if ( tester.currentBridge == who.id ) { // same selection
-        // remove selection
-        who.parentNode.className = "rowunselected";        
-        tester.currentBridge = null;
-        console.log( 'reset bridge selection' );
-      }
-      else { // other selection
-        // unselect previous
-        var previous = document.getElementById( tester.currentBridge );
-        if ( previous != null )
-          previous.parentNode.className = "rowunselected";
-        // select new
-        who.parentNode.className = "rowselected";
-        tester.currentBridge = who.id;
-        console.log( 'current bridge id = ' + who.id );
-      }
-    }
-  }
+  chTable = new Table('channellist','channel');
+  bridgeTable = new Table('bridgelist','bridge');
 }
 
 // channels view
 
 function addChannelToView(channel) {
-  var table = document.getElementById("channellist");
-  var row = table.insertRow(1);
-  var cell1 = row.insertCell(0);
-  cell1.innerHTML = channel.id;
-  cell1.id = channel.id;
-  var cell2 = row.insertCell(1);
-  cell2.innerHTML = channel.name;
-  cell2.id = channel.id;
-  var cell3 = row.insertCell(2);
-  cell3.innerHTML = channel.state;
-  cell3.id = channel.id;
+  chTable.addRow( channel.id, [channel.id,channel.name,channel.state] );
 }
 
 function removeChannelToView(id) {
-  var table = document.getElementById("channellist");
-  for ( var i = 1; i < table.rows.length; ++i ) {
-    var row = table.rows[i];
-    if ( row.cells[0].innerHTML == id ) {
-      table.deleteRow(i);
-      break;
-    }
-  }
+  chTable.removeRow(id);
 }
 
 function updateChannelView(channel) {
-  var id = channel.id;
-  var table = document.getElementById("channellist");
-  for ( var i = 1; i < table.rows.length; ++i ) {
-    var row = table.rows[i];
-    if ( row.cells[0].innerHTML == id ) {
-      row.cells[1].innerHTML = channel.name;        
-      row.cells[2].innerHTML = channel.state;
-      break;
-    }
-  }
+  chTable.updateRow( channel.id, [channel.id,channel.name,channel.state] );
 }
 
 // bridges view
 
 function addBridgeToView(bridge) {
-  var table = document.getElementById("bridgelist");
-  var row = table.insertRow(1);
-  var cell1 = row.insertCell(0);
-  cell1.innerHTML = bridge.id;
-  cell1.id = bridge.id;
-  var cell2 = row.insertCell(1);
-  cell2.innerHTML = bridge.technology;
-  cell2.id = bridge.id;
-  var cell3 = row.insertCell(2);
-  cell3.innerHTML = bridge.bridge_type;
-  cell3.id = bridge.id;
-  var cell4 = row.insertCell(3);
-  cell4.innerHTML = bridge.channels.join( '\n' );
-  cell4.id = bridge.id;
+  bridgeTable.addRow( bridge.id, [bridge.id,bridge.technology,bridge.bridge_type,bridge.channels.join( '\n' )] );
 }
 
 function removeBridgeToView(id) {
-  var table = document.getElementById("bridgelist");
-  for ( var i = 1; i < table.rows.length; ++i ) {
-    var row = table.rows[i];
-    if ( row.cells[0].innerHTML == id ) {
-      table.deleteRow(i);
-      break;
-    }
-  }
+  bridgeTable.removeRow(id);
 }
 
 function updateBridgeView(bridge) {
-  var id = bridge.id;
-  var table = document.getElementById("bridgelist");
-  for ( var i = 1; i < table.rows.length; ++i ) {
-    var row = table.rows[i];
-    if ( row.cells[0].innerHTML == id ) {
-      row.cells[2].innerHTML = bridge.bridge_type;
-      row.cells[3].innerHTML = bridge.channels.join( '\n' );
-      break;
-    }
-  }
+  bridgeTable.updateRow( bridge.id, [bridge.id,bridge.technology,bridge.bridge_type,bridge.channels.join( '\n' )] );
 }
 
 // devices view
@@ -479,99 +442,99 @@ function doCreateChAndOriginate() {
 }
 
 function doDialCh() {
-  if ( tester.currentCh != null ) {
-    httpSend( 'POST', 'channels/'+tester.currentCh+'/dial' );
+  if ( chTable.selection != null ) {
+    httpSend( 'POST', 'channels/'+chTable.selection+'/dial' );
   }
 }
 
 function doDTMF() {
-  if ( tester.currentCh != null ) {
+  if ( chTable.selection != null ) {
     var dtmf = getDTMF();
-    httpSend( 'POST', 'channels/'+tester.currentCh+'/dtmf?dtmf='+dtmf );
+    httpSend( 'POST', 'channels/'+chTable.selection+'/dtmf?dtmf='+dtmf );
   }
 }
 
 function doHangup() {
-  if ( tester.currentCh != null ) {
-    httpSend( 'DELETE', 'channels/'+tester.currentCh );
+  if ( chTable.selection != null ) {
+    httpSend( 'DELETE', 'channels/'+chTable.selection );
   }
 }
 
 function doAnswer() {
-  if ( tester.currentCh != null ) {
-    httpSend( 'POST', 'channels/'+tester.currentCh+'/answer' );
+  if ( chTable.selection != null ) {
+    httpSend( 'POST', 'channels/'+chTable.selection+'/answer' );
   }
 }
 
 function doRing() {
-  if ( tester.currentCh != null ) {
-    httpSend( 'POST', 'channels/'+tester.currentCh+'/ring' );
+  if ( chTable.selection != null ) {
+    httpSend( 'POST', 'channels/'+chTable.selection+'/ring' );
   }
 }
 
 function doStopRing() {
-  if ( tester.currentCh != null ) {
-    httpSend( 'DELETE', 'channels/'+tester.currentCh+'/ring' );
+  if ( chTable.selection != null ) {
+    httpSend( 'DELETE', 'channels/'+chTable.selection+'/ring' );
   }
 }
 
 function doMute() {
-  if ( tester.currentCh != null ) {
-    httpSend( 'POST', 'channels/'+tester.currentCh+'/mute' );
+  if ( chTable.selection != null ) {
+    httpSend( 'POST', 'channels/'+chTable.selection+'/mute' );
   }
 }
 
 function doUnMute() {
-  if ( tester.currentCh != null ) {
-    httpSend( 'DELETE', 'channels/'+tester.currentCh+'/mute' );
+  if ( chTable.selection != null ) {
+    httpSend( 'DELETE', 'channels/'+chTable.selection+'/mute' );
   }
 }
 
 function doHold() {
-  if ( tester.currentCh != null ) {
-    httpSend( 'POST', 'channels/'+tester.currentCh+'/hold' );
+  if ( chTable.selection != null ) {
+    httpSend( 'POST', 'channels/'+chTable.selection+'/hold' );
   }
 }
 
 function doUnHold() {
-  if ( tester.currentCh != null ) {
-    httpSend( 'DELETE', 'channels/'+tester.currentCh+'/hold' );
+  if ( chTable.selection != null ) {
+    httpSend( 'DELETE', 'channels/'+chTable.selection+'/hold' );
   }
 }
 
 function doMoh() {
-  if ( tester.currentCh != null ) {
-    httpSend( 'POST', 'channels/'+tester.currentCh+'/moh' );
+  if ( chTable.selection != null ) {
+    httpSend( 'POST', 'channels/'+chTable.selection+'/moh' );
   }
 }
 
 function doEndMoh() {
-  if ( tester.currentCh != null ) {
-    httpSend( 'DELETE', 'channels/'+tester.currentCh+'/moh' );
+  if ( chTable.selection != null ) {
+    httpSend( 'DELETE', 'channels/'+chTable.selection+'/moh' );
   }
 }
 
 function doSilence() {
-  if ( tester.currentCh != null ) {
-    httpSend( 'POST', 'channels/'+tester.currentCh+'/silence' );
+  if ( chTable.selection != null ) {
+    httpSend( 'POST', 'channels/'+chTable.selection+'/silence' );
   }
 }
 
 function doEndSilence() {
-  if ( tester.currentCh != null ) {
-    httpSend( 'DELETE', 'channels/'+tester.currentCh+'/silence' );
+  if ( chTable.selection != null ) {
+    httpSend( 'DELETE', 'channels/'+chTable.selection+'/silence' );
   }
 }
 
 function doSnoop() {
-  if ( tester.currentCh != null ) {
-    httpSend( 'POST', 'channels/'+tester.currentCh+'/snoop?app='+tester.app+'&spy=both' );
+  if ( chTable.selection != null ) {
+    httpSend( 'POST', 'channels/'+chTable.selection+'/snoop?app='+tester.app+'&spy=both' );
   }
 }
 
 function doRedirect() {
-  if ( tester.currentCh != null ) {
-    httpSend( 'POST', 'channels/'+tester.currentCh+'/redirect?endpoint='+getExtension() );
+  if ( chTable.selection != null ) {
+    httpSend( 'POST', 'channels/'+chTable.selection+'/redirect?endpoint='+getExtension() );
   }
 }
 
@@ -583,21 +546,21 @@ function doCreateBridge() {
 }
 
 function doDeleteBridge() {
-  if ( tester.currentBridge != null ) {
-    httpSend( 'DELETE', 'bridges/'+tester.currentBridge );
+  if ( bridgeTable.selection != null ) {
+    httpSend( 'DELETE', 'bridges/'+bridgeTable.selection );
   }
 }
 
 function doAddChToBridge() {
-  if ( tester.currentBridge != null && tester.currentCh != null ) {
+  if ( bridgeTable.selection != null && chTable.selection != null ) {
     var role = document.getElementById("chrole").value;
-    httpSend( 'POST', 'bridges/'+tester.currentBridge+'/addChannel?channel='+tester.currentCh+'&role='+role );
+    httpSend( 'POST', 'bridges/'+bridgeTable.selection+'/addChannel?channel='+chTable.selection+'&role='+role );
   }
 }
 
 function doRemoveChFromBridge() {
-  if ( tester.currentBridge != null && tester.currentCh != null ) {
-    httpSend( 'POST', 'bridges/'+tester.currentBridge+'/removeChannel?channel='+tester.currentCh );
+  if ( bridgeTable.selection != null && chTable.selection != null ) {
+    httpSend( 'POST', 'bridges/'+bridgeTable.selection+'/removeChannel?channel='+chTable.selection );
   }
 }
 
@@ -609,14 +572,14 @@ function doDial() {
 }
 
 function doMohBridge() {
-  if ( tester.currentBridge != null ) {
-    httpSend( 'POST', 'bridges/'+tester.currentBridge+'/moh' );
+  if ( bridgeTable.selection != null ) {
+    httpSend( 'POST', 'bridges/'+bridgeTable.selection+'/moh' );
   }
 }
 
 function doStopMohBridge() {
-  if ( tester.currentBridge != null ) {
-    httpSend( 'DELETE', 'bridges/'+tester.currentBridge+'/moh' );
+  if ( bridgeTable.selection != null ) {
+    httpSend( 'DELETE', 'bridges/'+bridgeTable.selection+'/moh' );
   }
 }
 
