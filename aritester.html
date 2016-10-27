@@ -1,4 +1,4 @@
-<!doctype html> 
+<!doctype html>
 
 <!--
 ARI TESTER
@@ -24,7 +24,7 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 -->
 
-<html>
+<html lang="en-US">
 <head>
 
 <title>ARI Tester</title> 
@@ -47,7 +47,7 @@ body {
 }
 
 .flex-container > * {
-  padding: 15px;
+//  padding: 15px;
   -webkit-flex: 1 100%;
   flex: 1 100%;
 }
@@ -58,11 +58,12 @@ body {
 }
 */
 
-header {background: black;color:white;}
-footer {background: #aaa;color:white;}
-.loginbox {background:#eee;}
+header {background: black; color: white;}
+footer {background: #aaa; color: white;}
+.loginbox {background: #eee;}
   
 .loginbox {
+  padding: 15px;
   order: 2;
   flex: 0 0 auto;
   height: 250px;
@@ -107,28 +108,36 @@ footer {
   order: 7;
 }
 
+.cmdsbox {
+  padding: 15px;
+}
 .cmdsbox button {
-  width: 100px;
+  width: 150px;
 }
 .cmdsbox input {
-  width: 80px;
+  width: 100px;
 }
 .cmdsbox select {
-  width: 80px;
+  width: 100px;
+}
+
+.cmds ul {
+  list-style: none;
+  //margin-left: 0;
+  padding-left: 0;
 }
 
 table {
   border-collapse: collapse;
   text-align: left;
 }
-
 .rowselected { background-color: #e6eef4; }
 .rowunselected { background-color: white; }
-th { background-color: grey; color: white; }
-
+th { background-color: #eee; }
 .tablebox {
   height: 150px;
-  padding: 15px 0px 15px 0px;
+  //padding: 15px 0px 15px 0px;
+  border: 1px solid #eee;
 }
 
 
@@ -143,9 +152,9 @@ th { background-color: grey; color: white; }
 }
 
 @media all and (min-width: 768px) {
-  .loginbox {text-align:left;-webkit-flex: 1 auto;flex:1 auto;-webkit-order:1;order:1;}
-  .article {-webkit-flex:5 0px;flex:5 0px;-webkit-order:2;order:2;}
-  footer {-webkit-order:3;order:3;}
+  .loginbox {text-align: left;-webkit-flex: 1 auto;flex:1 auto; -webkit-order: 1; order: 1;}
+  .article {-webkit-flex: 5 0px; flex: 5 0px; -webkit-order: 2; order: 2;}
+  footer {-webkit-order: 3; order: 3;}
 }
 */
 
@@ -613,83 +622,95 @@ function doStopMohBridge() {
   </div>
 
   <div id="btncmdsbox" class="cmdsbox">
-    <table>    
-      <tr><td><button onClick="doCreateChannel()" id="createch">Create</button></td><td>Ext:</td><td><input id="ext" value="101"></td></tr>
-      <tr><td><button onClick="doCreateChAndOriginate()" id="createchorig">Create And Dial</button></td></tr>
-      <tr><td><button onClick="doDTMF()" id="senddtmf">DTMF</button></td><td>DTMF:</td><td><input id="dtmf" value="*"></td></tr>
-      <tr><td><button onClick="doRing()" id="ring">Ring</button></td></tr>
-      <tr><td><button onClick="doStopRing()" id="stopring">End Ring</button></td></tr>
-      <tr><td><button onClick="doMute()" id="mute">Mute</button></td></tr>
-      <tr><td><button onClick="doUnMute()" id="unmute">Unmute</button></td></tr>
-      <tr><td><button onClick="doHold()" id="hold">Hold</button></td></tr>
-      <tr><td><button onClick="doUnHold()" id="unhold">Unhold</button></td></tr>
-      <tr><td><button onClick="doMoh()" id="moh">Moh</button></td></tr>
-      <tr><td><button onClick="doEndMoh()" id="endmoh">End Moh</button></td></tr>
-      <tr><td><button onClick="doSilence()" id="silence">Silence</button></td></tr>
-      <tr><td><button onClick="doEndSilence()" id="endsilence">End Silence</button></td></tr>
-      <tr><td><button onClick="doAnswer()" id="answer">Answer</button></td></tr>
-      <tr><td><button onClick="doHangup()" id="hangup">Hangup</button></td></tr>     
-      <tr><td><button onClick="doSnoop()" id="snoop">Snoop</button></td></tr>       
-      <tr><td><button onClick="doDialCh()" id="dialch">Dial</button></td></tr>
-      <tr><td><button onClick="doRedirect()" id="redirect">Redirect</button></td></tr>
-    </table>
     
     <div class="tablebox">
-    <table id="channellist" class="table" border="1" width=500>
-      <tr><th>Id</th><th>Name</th><th>State</th></tr>
-    </table>
+      <table id="channellist" class="table" border="1" width=500>
+        <tr><th>Id</th><th>Name</th><th>State</th></tr>
+      </table>
     </div>
 
+    <div class="cmds"> 
+      <ul>
+        <li>
+          <button onClick="doCreateChannel()" id="createch">Create</button>
+          Ext:
+          <input id="ext" value="101">
+        </li>
+        <li><button onClick="doCreateChAndOriginate()" id="createchorig">Create And Dial</button></li>
+        <li>
+          <button onClick="doDTMF()" id="senddtmf">DTMF</button>
+          DTMF:
+          <input id="dtmf" value="*">
+        </li>
+        <li><button onClick="doRing()" id="ring">Ring</button></li>
+        <li><button onClick="doStopRing()" id="stopring">End Ring</button></li>
+        <li><button onClick="doMute()" id="mute">Mute</button></li>
+        <li><button onClick="doUnMute()" id="unmute">Unmute</button></li>
+        <li><button onClick="doHold()" id="hold">Hold</button></li>
+        <li><button onClick="doUnHold()" id="unhold">Unhold</button></li>
+        <li><button onClick="doMoh()" id="moh">Moh</button></li>
+        <li><button onClick="doEndMoh()" id="endmoh">End Moh</button></li>
+        <li><button onClick="doSilence()" id="silence">Silence</button></li>
+        <li><button onClick="doEndSilence()" id="endsilence">End Silence</button></li>
+        <li><button onClick="doAnswer()" id="answer">Answer</button></li>
+        <li><button onClick="doHangup()" id="hangup">Hangup</button></li>
+        <li><button onClick="doSnoop()" id="snoop">Snoop</button></li>       
+        <li><button onClick="doDialCh()" id="dialch">Dial</button></li>
+        <li><button onClick="doRedirect()" id="redirect">Redirect</button></li>
+      </ul>
+    </div>
+  
   </div>    
 
   <div id="bridgecmdsbox" class="cmdsbox">
-    <table>    
-      <tr>
-        <td><button onClick="doCreateBridge()" id="createbridge">Create</button></td>
-        <td>Type:</td>
-        <td>
-          <select id="bridgetype" name="bridgetype">
-            <option value="mixing" selected="selected">mixing</option>
-            <option value="holding">holding</option>
-            <option value="dtmf_events">dtmf_events</option>
-            <option value="proxy_media">proxy_media</option>
-          </select>
-        </td>
+    
+    <div class="tablebox">
+      <table id="bridgelist" class="table" border="1" width=600>
+        <tr><th>Id</th><th>Technology</th><th>Type</th><th>Channels</th></tr>
+      </table>
+    </div>
 
-      </tr>
-      <tr><td><button onClick="doDeleteBridge()" id="deletebridge">Delete</button></td></tr>
-      <tr>
-        <td><button onClick="doAddChToBridge()" id="addchtobridge">Add Channel</button></td>
-        <td>Role:</td>
-        <td>
+    <div class="cmds">      
+      <ul>
+        <li>
+          <button onClick="doCreateBridge()" id="createbridge">Create</button>
+          Type:
+            <select id="bridgetype" name="bridgetype">
+              <option value="mixing" selected="selected">mixing</option>
+              <option value="holding">holding</option>
+              <option value="dtmf_events">dtmf_events</option>
+              <option value="proxy_media">proxy_media</option>
+            </select>        
+        </li>
+        <li><button onClick="doDeleteBridge()" id="deletebridge">Delete</button></li>
+        <li>
+          <button onClick="doAddChToBridge()" id="addchtobridge">Add Channel</button>
+          Role:
           <select id="chrole" name="chrole">
             <option value="partecipant" selected="selected">partecipant</option>
             <option value="announcer">announcer</option>
           </select>
-        </td>
-      </tr>
-      <tr><td><button onClick="doRemoveChFromBridge()" id="removechfrombridge">Remove channel</button></td></tr>
-      <tr><td><button onClick="doMohBridge()" id="addmohtobridge">Moh</button></td></tr>
-      <tr><td><button onClick="doStopMohBridge()" id="stopmohfrombridge">Stop Moh</button></td></tr>
-      <tr>
-        <td><button onClick="doDial()" id="dial">Dial</button></td>
-        <td>From:</td><td><input id="from" value="101"></td>
-        <td>To:</td><td><input id="to" value="290"></td>
-        <td>Context:</td><td><input id="context" value="LocalSets"></td></tr>
-    </table>
-    
-    <div class="tablebox">
-    <table id="bridgelist" class="table" border="1" width=500>
-      <tr><th>Id</th><th>Technology</th><th>Type</th><th>Channels</th></tr>
-    </table>
+        </li>
+        <li><button onClick="doRemoveChFromBridge()" id="removechfrombridge">Remove channel</button></li>
+        <li><button onClick="doMohBridge()" id="addmohtobridge">Moh</button></li>
+        <li><button onClick="doStopMohBridge()" id="stopmohfrombridge">Stop Moh</button></li>
+        <li>
+          <button onClick="doDial()" id="dial">Dial</button>
+          From:</td><td><input id="from" value="101">
+          To:</td><td><input id="to" value="290">
+          Context:</td><td><input id="context" value="LocalSets">
+        </li>
+      </ul>
     </div>
-
+        
   </div>
   
-  <div id="devicebox" class="tablebox">
-    <table id="devicelist" border="1" width=300>
-      <tr><th>Name</th><th>State</th></tr>
-    </table> 
+  <div id="bridgecmdsbox" class="cmdsbox">
+    <div id="devicebox" class="tablebox">
+      <table id="devicelist" border="1" width=300>
+        <tr><th>Name</th><th>State</th></tr>
+      </table> 
+    </div>
   </div>
 
   <div id="eventbox">
