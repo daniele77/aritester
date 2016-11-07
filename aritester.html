@@ -437,9 +437,15 @@ function doLogoff() {
 
 // channel functions
 
-function getExtension() {
-  var ext = document.getElementById("ext").value;
-  if ( ext.indexOf('/') == -1 ) ext = "SIP/"+ext;
+function getExtension(id) {
+  var ext = document.getElementById(id).value;
+  if ( ext.indexOf('/') == -1 ) ext = "sip/"+ext;
+  return ext; 
+}
+
+function getTech(id) {
+  var ext = document.getElementById(id).value;
+  if ( ext.indexOf(':') == -1 ) ext = "sip:"+ext;
   return ext; 
 }
 
@@ -449,12 +455,12 @@ function getDTMF() {
 }
 
 function doCreateChannel() {
-  var ext = getExtension();
+  var ext = getExtension("ext");
   httpSend( 'POST', 'channels/create?endpoint='+ext+'&app='+tester.app );
 }
 
 function doCreateChAndOriginate() {
-  var ext = getExtension();
+  var ext = getExtension("ext");
   httpSend( 'POST', 'channels?endpoint='+ext+'&app='+tester.app );
 }
 
@@ -551,7 +557,7 @@ function doSnoop() {
 
 function doRedirect() {
   if ( chTable.selection != null ) {
-    httpSend( 'POST', 'channels/'+chTable.selection+'/redirect?endpoint='+getExtension() );
+    httpSend( 'POST', 'channels/'+chTable.selection+'/redirect?endpoint='+getExtension("ext") );
   }
 }
 
@@ -599,6 +605,17 @@ function doStopMohBridge() {
     httpSend( 'DELETE', 'bridges/'+bridgeTable.selection+'/moh' );
   }
 }
+
+// endpoints functions
+
+function doSendMessage() {
+  var msg = document.getElementById("textmsg").value;
+  httpSend( 'PUT', 
+            'endpoints/sendMessage?to='+getTech("msgto")
+            +'&from='+getTech("msgto")
+            +'&body='+msg );
+}
+
 
 </script> 
 </head>
@@ -688,7 +705,7 @@ function doStopMohBridge() {
               <option value="holding">holding</option>
               <option value="dtmf_events">dtmf_events</option>
               <option value="proxy_media">proxy_media</option>
-            </select>        
+            </select>
         </li>
         <li><button onClick="doDeleteBridge()" id="deletebridge">Delete</button></li>
         <li>
@@ -718,6 +735,18 @@ function doStopMohBridge() {
       <table id="devicelist" border="1" width=300>
         <tr><th>Name</th><th>State</th></tr>
       </table> 
+    </div>
+    <div class="cmds">
+      <ul>
+        <li><textarea cols="37" rows="7" id="textmsg"></textarea></li>
+        <li>
+          From:
+          <input id="msgfrom" value="101">
+          To:
+          <input id="msgto" value="290">
+        </li>
+        <li><button onClick="doSendMessage()" id="sendmsg">Send Msg</button></li>
+      </ul>
     </div>
   </div>
 
