@@ -127,6 +127,12 @@ footer {
 .cmdsbox select {
   width: 100px;
 }
+.cmdsbox label { margin-left: 20px; }
+.cmdsbox input[type="checkbox"] {
+    margin: 0;
+    padding: 0;
+    width: 20px;
+}
 
 .cmds ul {
   list-style: none;
@@ -565,6 +571,10 @@ function doRedirect() {
 
 function doCreateBridge() {
   var type = document.getElementById("bridgetype").value;
+  var att1 = document.getElementById("dtmfev");  
+  type += ( att1.checked ? att1.value : "" );
+  var att2 = document.getElementById("proxym");  
+  type += ( att2.checked ? att2.value : "" );
   httpSend( 'POST', 'bridges?type='+type );
 }
 
@@ -703,9 +713,9 @@ function doSendMessage() {
             <select id="bridgetype" name="bridgetype">
               <option value="mixing" selected="selected">mixing</option>
               <option value="holding">holding</option>
-              <option value="dtmf_events">dtmf_events</option>
-              <option value="proxy_media">proxy_media</option>
             </select>
+          <label for="dtmfev">dtmf events</label><input type="checkbox" name="bridgeatt" value=",dtmf_events" id="dtmfev"/>
+          <label for="proxym">proxy media</label><input type="checkbox" name="bridgeatt" value=",proxy_media" id="proxym"/>
         </li>
         <li><button onClick="doDeleteBridge()" id="deletebridge">Delete</button></li>
         <li>
