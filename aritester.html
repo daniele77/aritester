@@ -152,6 +152,7 @@ th { background-color: #eee; }
   height: 150px;
   //padding: 15px 0px 15px 0px;
   border: 1px solid #eee;
+  overflow: auto;
 }
 
 
@@ -508,14 +509,16 @@ function doStopRing() {
 }
 
 function doMute() {
+  var direction = document.getElementById("mutedirection").value;
   if ( chTable.selection != null ) {
-    httpSend( 'POST', 'channels/'+chTable.selection+'/mute' );
+    httpSend( 'POST', 'channels/'+chTable.selection+'/mute?direction='+direction );
   }
 }
 
 function doUnMute() {
+  var direction = document.getElementById("mutedirection").value;
   if ( chTable.selection != null ) {
-    httpSend( 'DELETE', 'channels/'+chTable.selection+'/mute' );
+    httpSend( 'DELETE', 'channels/'+chTable.selection+'/mute?direction='+direction );
   }
 }
 
@@ -679,7 +682,16 @@ function doSendMessage() {
         </li>
         <li><button onClick="doRing()" id="ring">Ring</button></li>
         <li><button onClick="doStopRing()" id="stopring">End Ring</button></li>
-        <li><button onClick="doMute()" id="mute">Mute</button></li>
+        <li>
+          <button onClick="doMute()" id="mute">Mute</button>
+          Direction:
+          <select id="mutedirection" name="mutedirection">
+            <option value="both" selected="selected">both</option>
+            <option value="in">in</option>
+            <option value="out">out</option>
+          </select>
+
+        </li>
         <li><button onClick="doUnMute()" id="unmute">Unmute</button></li>
         <li><button onClick="doHold()" id="hold">Hold</button></li>
         <li><button onClick="doUnHold()" id="unhold">Unhold</button></li>
@@ -759,7 +771,6 @@ function doSendMessage() {
       </ul>
     </div>
   </div>
-
   <div id="eventbox">
     <ul id="events"></ul>
   </div>
