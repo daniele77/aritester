@@ -570,6 +570,14 @@ function doRedirect() {
   }
 }
 
+function doContinueInDialplan() {
+  var context = document.getElementById("dp_context").value;
+  var ext = document.getElementById("dp_ext").value;
+  if ( chTable.selection != null ) {
+    httpSend( 'POST', 'channels/'+chTable.selection+'/continue?context='+context+'&extension='+ext+'&priority=1');
+  }
+}
+
 // bridge functions
 
 function doCreateBridge() {
@@ -690,7 +698,6 @@ function doSendMessage() {
             <option value="in">in</option>
             <option value="out">out</option>
           </select>
-
         </li>
         <li><button onClick="doUnMute()" id="unmute">Unmute</button></li>
         <li><button onClick="doHold()" id="hold">Hold</button></li>
@@ -704,6 +711,13 @@ function doSendMessage() {
         <li><button onClick="doSnoop()" id="snoop">Snoop</button></li>       
         <li><button onClick="doDialCh()" id="dialch">Dial</button></li>
         <li><button onClick="doRedirect()" id="redirect">Redirect</button></li>
+        <li>
+          <button onClick="doContinueInDialplan()" id="continue">To Dialplan</button>
+          Context:
+          <input id="dp_context" value="LocalSets">
+          Ext:
+          <input id="dp_ext" value="101">
+        </li>
       </ul>
     </div>
   
