@@ -58,15 +58,15 @@ body {
 }
 */
 
-header {background: black; color: white;}
-footer {background: #aaa; color: white;}
+header {background: black; color: white; padding-left: 15px;}
+footer {background: #aaa; color: white; padding-left: 15px;}
 .loginbox {background: #eee;}
   
 .loginbox {
   padding: 15px;
   order: 2;
   flex: 0 0 auto;
-  height: 250px;
+  height: 280px;
 }
 .descriptionbox {
 //  order: 1;
@@ -77,6 +77,16 @@ footer {background: #aaa; color: white;}
   height: 100px;
   margin: 20px 0px 20px 0px;
 }
+.loginbtnsbox {
+  margin: 15px 0px 20px 0px;
+}
+/*
+.optionsbox {
+  width: 250px;
+  height: 50px;
+  margin: 20px 0px 20px 0px;
+}
+*/
 #btncmdsbox {
   order: 3;
   flex: 0 0 auto;
@@ -129,9 +139,9 @@ footer {
 }
 .cmdsbox label { margin-left: 20px; }
 .cmdsbox input[type="checkbox"] {
-    margin: 0;
-    padding: 0;
-    width: 20px;
+  margin: 0;
+  padding: 0;
+  width: 20px;
 }
 
 .cmds ul {
@@ -139,6 +149,16 @@ footer {
   //margin-left: 0;
   padding-left: 0;
   //width: 10em;
+}
+
+.sectiontitle {
+  background: #cfcfcf;
+  color: #383838;
+  height: 26px;
+  font-size: 110%;
+  font-weight: bold;
+  padding-left: 10px;
+  padding-top: 6px;
 }
 
 table {
@@ -151,7 +171,7 @@ th { background-color: #eee; }
 .tablebox {
   height: 150px;
   //padding: 15px 0px 15px 0px;
-  border: 1px solid #eee;
+  border: 1px solid #ababab;
   overflow: auto;
 }
 
@@ -467,7 +487,7 @@ function doCreateChannel() {
 }
 
 function doCreateChAndOriginate() {
-  var ext = getExtension("ext");
+  var ext = getExtension("createchandoriginate_ext");
   httpSend( 'POST', 'channels?endpoint='+ext+'&app='+tester.app );
 }
 
@@ -565,8 +585,9 @@ function doSnoop() {
 }
 
 function doRedirect() {
+  var ext = getExtension("redirect_ext");
   if ( chTable.selection != null ) {
-    httpSend( 'POST', 'channels/'+chTable.selection+'/redirect?endpoint='+getExtension("ext") );
+    httpSend( 'POST', 'channels/'+chTable.selection+'/redirect?endpoint='+ext );
   }
 }
 
@@ -657,20 +678,33 @@ function doSendMessage() {
     </div>
 
     <table>
-      <tr><td>Username:</td><td><input id="username" value="asterisk"></td></tr>
-      <tr><td>Secret:</td><td><input type="password" id="secret" value="asterisk"></td></tr>
-      <tr><td>Application:</td><td><input id="application" value="attendant"></td></tr>
-      <tr>
-        <td><button id="login" onClick="doLogin()">Login</button></td>
-        <td><button id="logoff" disabled=1 onClick="doLogoff()">Logoff</button></td>
-      </tr>
+      <tr><td>Username:</td><td><input id="username"></td></tr>
+      <tr><td>Secret:</td><td><input type="password" id="secret"></td></tr>
+      <tr><td>Application:</td><td><input id="application"></td></tr>
     </table>    
+    
+    <div class="loginbtnsbox">
+        <button id="login" onClick="doLogin()">Login</button>
+        <button id="logoff" disabled=1 onClick="doLogoff()">Logoff</button>
+    </div>
+      
+
+<!--    
+    <div class="optionsbox">
+      <label for="tooltipsenabled">Enable tool tips</label><input type="checkbox" name="tooltip" value="tooltip" id="tooltipsenabled"/>
+    </div>
+-->
+
   </div>
 
   <div id="btncmdsbox" class="cmdsbox">
     
+    <div class="sectiontitle">
+    Channels
+    </div>
+    
     <div class="tablebox">
-      <table id="channellist" class="table" border="1" width=500>
+      <table id="channellist" class="table" border="1" width=601>
         <tr><th>Id</th><th>Name</th><th>State</th></tr>
       </table>
     </div>
@@ -678,13 +712,23 @@ function doSendMessage() {
     <div class="cmds"> 
       <ul>
         <li>
-          <button onClick="doCreateChannel()" id="createch">Create</button>
+          <button onClick="doCreateChannel()" id="createch" title="Create a channel">Create Only</button>
           Ext:
-          <input id="ext" value="101">
+          <input id="ext">
         </li>
-        <li><button onClick="doCreateChAndOriginate()" id="createchorig">Create And Dial</button></li>
         <li>
-          <button onClick="doDTMF()" id="senddtmf">DTMF</button>
+          <button onClick="doCreateChAndOriginate()" id="createchorig" title="Create a channel and dial <ext>">Create And Dial</button>
+          Ext:
+          <input id="createchandoriginate_ext">
+        </li>
+        <li>
+          <button onClick="doDial()" id="dial" title="Create a channel (from) and dial to <context> <to>">Dial</button>
+          From:</td><td><input id="from">
+          To:</td><td><input id="to">
+          Context:</td><td><input id="context">
+        </li>
+        <li>
+          <button onClick="doDTMF()" id="senddtmf" title="Send a DTMF sequence to selected channel">DTMF</button>
           DTMF:
           <input id="dtmf" value="*">
         </li>
@@ -710,13 +754,17 @@ function doSendMessage() {
         <li><button onClick="doHangup()" id="hangup">Hangup</button></li>
         <li><button onClick="doSnoop()" id="snoop">Snoop</button></li>       
         <li><button onClick="doDialCh()" id="dialch">Dial</button></li>
-        <li><button onClick="doRedirect()" id="redirect">Redirect</button></li>
         <li>
-          <button onClick="doContinueInDialplan()" id="continue">To Dialplan</button>
-          Context:
-          <input id="dp_context" value="LocalSets">
+          <button onClick="doRedirect()" id="redirect" title="redirect selected channel to <ext> (sip refer)">Redirect</button>
           Ext:
-          <input id="dp_ext" value="101">
+          <input id="redirect_ext">
+        </li>
+        <li>
+          <button onClick="doContinueInDialplan()" id="continue" title="make the selected channel exit from stasis app and continue to <context> <ext>">To Dialplan</button>
+          Context:
+          <input id="dp_context">
+          Ext:
+          <input id="dp_ext">
         </li>
       </ul>
     </div>
@@ -724,6 +772,10 @@ function doSendMessage() {
   </div>    
 
   <div id="bridgecmdsbox" class="cmdsbox">
+    
+    <div class="sectiontitle">
+    Bridges
+    </div>
     
     <div class="tablebox">
       <table id="bridgelist" class="table" border="1" width=600>
@@ -755,20 +807,19 @@ function doSendMessage() {
         <li><button onClick="doRemoveChFromBridge()" id="removechfrombridge">Remove channel</button></li>
         <li><button onClick="doMohBridge()" id="addmohtobridge">Moh</button></li>
         <li><button onClick="doStopMohBridge()" id="stopmohfrombridge">Stop Moh</button></li>
-        <li>
-          <button onClick="doDial()" id="dial">Dial</button>
-          From:</td><td><input id="from" value="101">
-          To:</td><td><input id="to" value="290">
-          Context:</td><td><input id="context" value="LocalSets">
-        </li>
       </ul>
     </div>
         
   </div>
   
   <div id="devicebox" class="cmdsbox">
+  
+    <div class="sectiontitle">
+    Devices
+    </div>
+    
     <div class="tablebox">
-      <table id="devicelist" border="1" width=300>
+      <table id="devicelist" border="1" width=305>
         <tr><th>Name</th><th>State</th></tr>
       </table> 
     </div>
@@ -777,9 +828,9 @@ function doSendMessage() {
         <li><textarea cols="37" rows="7" id="textmsg"></textarea></li>
         <li>
           From:
-          <input id="msgfrom" value="101">
+          <input id="msgfrom">
           To:
-          <input id="msgto" value="290">
+          <input id="msgto">
         </li>
         <li><button onClick="doSendMessage()" id="sendmsg">Send Msg</button></li>
       </ul>
