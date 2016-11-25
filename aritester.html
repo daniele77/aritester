@@ -61,7 +61,7 @@ body {
 header {background: black; color: white; padding-left: 15px;}
 footer {background: #aaa; color: white; padding-left: 15px;}
 .loginbox {background: #eee;}
-  
+
 .loginbox {
   padding: 15px;
   order: 2;
@@ -175,6 +175,14 @@ th { background-color: #eee; }
   overflow: auto;
 }
 
+.infomsg { color: black; }
+.errormsg { color: red; }
+.warningmsg { color: orange; }
+.arieventmsg { color: blue; }
+.connectionmsg { color: pink; }
+.requestmsg { color: grey; }
+.responsemsg { color: grey; }
+
 
 /*
 .loginbox ul {
@@ -273,8 +281,11 @@ Table.prototype.updateRow = function(id,data) {
 
 // end Table class
 
-function append(text) {
-  document.getElementById("events").insertAdjacentHTML('beforeend', "<li>" + text + ";</li>" );
+function append(text,liclass="infomsg") {
+  document.getElementById("events").insertAdjacentHTML(
+    'beforeend',
+    '<li class="' + liclass + '">' + text + '</li>'
+  );
 }
 
 var chTable;
@@ -344,14 +355,19 @@ function httpSend(act,cmd) {
   var req = new XMLHttpRequest();
   var url = "http://"+tester.ip+"/ari/"+cmd;
   console.log( "requesting: " + act + " " + url );
+  append( act + " " + url, "requestmsg" );
   req.open( act, url, true, tester.user, tester.psw );
   req.addEventListener("load", function(){
     console.log( 'http ' + act + ' sent' );
-    append( req.responseText );
+    var statusType = req.status / 100;
+    var msgClass = "responsemsg";
+    if ( statusType == 4 || statusType == 5 )
+        msgClass = "errormsg";
+    append( req.status.toString() + " " + req.statusText + req.responseText, msgClass );
   });
   req.addEventListener("error", function(){
     console.log( 'http ' + act + ' error' );
-    append( 'http ' + act + ' error' );
+    append( 'http ' + act + ' error', "errormsg" );
   });
   req.send(null);
 }
@@ -359,7 +375,7 @@ function httpSend(act,cmd) {
 // subscribe for all SIP channel events:
 function subscribe() {
   //httpSend( 'POST', 'applications/'+tester.app+'/subscription?eventSource=endpoint:SIP' );
-  
+
   // subscribe for all events from channels,endpoint,bridge and devices source
   httpSend( 'POST', 'applications/'+tester.app+'/subscription?eventSource=channel:,endpoint:,bridge:,deviceState:' );
 }
@@ -439,22 +455,22 @@ function doLogin() {
   var service = new WebSocket('ws://'+ip+'/ari/events?api_key='+user+':'+psw+'&app='+app+'&subscribeAll=true');
   tester.socket = service;
   service.onmessage = function(event){
-    append(event.data);
+    append(event.data, "arieventmsg");
     parseEvent(event.data);
   } 
   service.onopen = function(){
-    append("Connected");
+    append("Connected", "connectionmsg");
     subscribe();
     document.getElementById("logoff").disabled=0;
     document.getElementById("login").disabled=1;
   } 
   service.onclose = function(){
-    append("Disconnected");
+    append("Disconnected", "connectionmsg");
     document.getElementById("logoff").disabled=1;
     document.getElementById("login").disabled=0;
   } 
   service.onerror = function(){
-    append("Connection error");
+    append("Connection error", "errormsg");
   }
 }
 
