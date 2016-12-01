@@ -31,11 +31,16 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 <style>
 
+
 body {
   /*background: #eeeeee;*/
   font-family: "Trebuchet MS", Verdana, Arial, serif;
 }
-
+/*
+ a {
+   text-decoration:none;
+ }
+ */
 
 .flex-container {
   display: -webkit-flex;
@@ -66,7 +71,7 @@ footer {background: #aaa; color: white; padding-left: 15px;}
   padding: 15px;
   order: 2;
   flex: 0 0 auto;
-  height: 280px;
+  height: 310px;
 }
 .descriptionbox {
 //  order: 1;
@@ -79,6 +84,10 @@ footer {background: #aaa; color: white; padding-left: 15px;}
 }
 .loginbtnsbox {
   margin: 15px 0px 20px 0px;
+}
+.menu ul {
+  list-style: none;
+  padding-left: 0;
 }
 /*
 .optionsbox {
@@ -201,6 +210,65 @@ th { background-color: #eee; }
 }
 */
 
+/* alignment of options grid */
+li { display: table-row; }
+li div { display: table-cell; vertical-align: middle; }
+.gridalign ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+/* modal box styles: */
+.modalDialog {
+    position: fixed;
+    font-family: Arial, Helvetica, sans-serif;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background: rgba(0,0,0,0.8);
+    z-index: 99999;
+    opacity:0;
+    -webkit-transition: opacity 400ms ease-in;
+    -moz-transition: opacity 400ms ease-in;
+    transition: opacity 400ms ease-in;
+    pointer-events: none;
+}
+.modalDialog:target {
+    opacity:1;
+    pointer-events: auto;
+}
+.modalDialog > div {
+    width: 400px;
+    position: relative;
+    margin: 10% auto;
+    padding: 5px 20px 13px 20px;
+    border-radius: 10px;
+    background: #fff;
+    background: -moz-linear-gradient(#fff, #999);
+    background: -webkit-linear-gradient(#fff, #999);
+    background: -o-linear-gradient(#fff, #999);
+}
+.close {
+    background: #606061;
+    color: #FFFFFF;
+    line-height: 25px;
+    position: absolute;
+    right: -12px;
+    text-align: center;
+    top: -10px;
+    width: 24px;
+    text-decoration: none;
+    font-weight: bold;
+    -webkit-border-radius: 12px;
+    -moz-border-radius: 12px;
+    border-radius: 12px;
+    -moz-box-shadow: 1px 1px 3px #000;
+    -webkit-box-shadow: 1px 1px 3px #000;
+    box-shadow: 1px 1px 3px #000;
+}
+.close:hover { background: #00d9ff; }
+
 </style>
 
 <script> 
@@ -218,7 +286,7 @@ function Table(id,desc) {
   this.table = document.getElementById(id);
   this.description = desc; // descriptive name of the table
   this.selection = null; // element own id
-  
+
   var self = this;
   this.table.onclick=function(e) {
     e = e || window.event;
@@ -681,7 +749,7 @@ function doSendMessage() {
 <body onload="onLoad()">
 
 <div class="flex-container">
-  
+
   <header>
     <h1>Asterisk&trade; ARI Tester</h1>
   </header>
@@ -693,147 +761,169 @@ function doSendMessage() {
       valid, appropriately permissioned username and secret and a stasis application.
     </div>
 
-    <table>
-      <tr><td>Username:</td><td><input id="username"></td></tr>
-      <tr><td>Secret:</td><td><input type="password" id="secret"></td></tr>
-      <tr><td>Application:</td><td><input id="application"></td></tr>
-    </table>    
-    
-    <div class="loginbtnsbox">
-        <button id="login" onClick="doLogin()">Login</button>
-        <button id="logoff" disabled=1 onClick="doLogoff()">Logoff</button>
+    <div  class="gridalign">
+    <ul>
+      <li>
+        <div><label for="username">Username:</label></div>
+        <div><input id="username"/></div>
+      </li>
+      <li>
+        <div><label for="secret">Secret:</label></div>
+        <div><input type="password" id="secret"/></div>
+      </li>
+      <li>
+        <div><label for="application">Application:</label></div>
+        <div><input id="application"/></div>
+      </li>
+    </ul>
     </div>
-      
 
-<!--    
-    <div class="optionsbox">
-      <label for="tooltipsenabled">Enable tool tips</label><input type="checkbox" name="tooltip" value="tooltip" id="tooltipsenabled"/>
+    <div class="loginbtnsbox">
+      <button id="login" onClick="doLogin()">Login</button>
+      <button id="logoff" disabled=1 onClick="doLogoff()">Logoff</button>
     </div>
--->
+
+    <div class="menu">
+      <ul>
+      <!-- <li><a href="#optionsDialog">options</a></li> TODO -->
+      <li><a href="#aboutDialog">about</a></li>
+      </ul>
+    </div>
 
   </div>
 
   <div id="btncmdsbox" class="cmdsbox">
-    
+
     <div class="sectiontitle">
     Channels
     </div>
-    
+
     <div class="tablebox">
       <table id="channellist" class="table" border="1" width=601>
         <tr><th>Id</th><th>Name</th><th>State</th></tr>
       </table>
     </div>
 
-    <div class="cmds"> 
+    <div class="cmds" class="gridalign">
       <ul>
         <li>
-          <button onClick="doCreateChannel()" id="createch" title="Create a channel">Create Only</button>
-          Ext:
-          <input id="ext">
+          <div><button onClick="doCreateChannel()" id="createch" title="Create a channel">Create Only</button></div>
+          <div><label for="createch">Ext:</label></div>
+          <div><input id="ext"></div>
         </li>
         <li>
-          <button onClick="doCreateChAndOriginate()" id="createchorig" title="Create a channel and dial <ext>">Create And Dial</button>
-          Ext:
-          <input id="createchandoriginate_ext">
+          <div><button onClick="doCreateChAndOriginate()" id="createchorig" title="Create a channel and dial <ext>">Create And Dial</button></div>
+          <div><label for="createchorig">Ext:</label></div>
+          <div><input id="createchandoriginate_ext"></div>
         </li>
         <li>
-          <button onClick="doDial()" id="dial" title="Create a channel (from) and dial to <context> <to>">Dial</button>
-          From:</td><td><input id="from">
-          To:</td><td><input id="to">
-          Context:</td><td><input id="context">
+          <div><button onClick="doDial()" id="dial" title="Create a channel (from) and dial to <context> <to>">Dial</button></div>
+          <div><label for="from">From:</label></div>
+          <div><input id="from"></div>
+          <div><label for="to">To:</label></div>
+          <div><input id="to"></div>
+          <div><label for="context">Context:</label></div>
+          <div><input id="context"></div>
         </li>
         <li>
-          <button onClick="doDTMF()" id="senddtmf" title="Send a DTMF sequence to selected channel">DTMF</button>
-          DTMF:
-          <input id="dtmf" value="*">
+          <div><button onClick="doDTMF()" id="senddtmf" title="Send a DTMF sequence to selected channel">DTMF</button></div>
+          <div><label for="dtmf">DTMF:</label></div>
+          <div><input id="dtmf" value="*"></div>
         </li>
-        <li><button onClick="doRing()" id="ring">Ring</button></li>
-        <li><button onClick="doStopRing()" id="stopring">End Ring</button></li>
+        <li><div><button onClick="doRing()" id="ring">Ring</button></div></li>
+        <li><div><button onClick="doStopRing()" id="stopring">End Ring</button></div></li>
         <li>
-          <button onClick="doMute()" id="mute">Mute</button>
-          Direction:
+          <div><button onClick="doMute()" id="mute">Mute</button></div>
+          <div><label for="mutedirection">Direction:</label></div>
+          <div>
           <select id="mutedirection" name="mutedirection">
             <option value="both" selected="selected">both</option>
             <option value="in">in</option>
             <option value="out">out</option>
           </select>
+          </div>
         </li>
-        <li><button onClick="doUnMute()" id="unmute">Unmute</button></li>
-        <li><button onClick="doHold()" id="hold">Hold</button></li>
-        <li><button onClick="doUnHold()" id="unhold">Unhold</button></li>
-        <li><button onClick="doMoh()" id="moh">Moh</button></li>
-        <li><button onClick="doEndMoh()" id="endmoh">End Moh</button></li>
-        <li><button onClick="doSilence()" id="silence">Silence</button></li>
-        <li><button onClick="doEndSilence()" id="endsilence">End Silence</button></li>
-        <li><button onClick="doAnswer()" id="answer">Answer</button></li>
-        <li><button onClick="doHangup()" id="hangup">Hangup</button></li>
-        <li><button onClick="doSnoop()" id="snoop">Snoop</button></li>       
-        <li><button onClick="doDialCh()" id="dialch">Dial</button></li>
+        <li><div><button onClick="doUnMute()" id="unmute">Unmute</button></div></li>
+        <li><div><button onClick="doHold()" id="hold">Hold</button></div></li>
+        <li><div><button onClick="doUnHold()" id="unhold">Unhold</button></div></li>
+        <li><div><button onClick="doMoh()" id="moh">Moh</button></div></li>
+        <li><div><button onClick="doEndMoh()" id="endmoh">End Moh</button></div></li>
+        <li><div><button onClick="doSilence()" id="silence">Silence</button></div></li>
+        <li><div><button onClick="doEndSilence()" id="endsilence">End Silence</button></div></li>
+        <li><div><button onClick="doAnswer()" id="answer">Answer</button></div></li>
+        <li><div><button onClick="doHangup()" id="hangup">Hangup</button></div></li>
+        <li><div><button onClick="doSnoop()" id="snoop">Snoop</button></div></li>
+        <li><div><button onClick="doDialCh()" id="dialch">Dial</button></div></li>
         <li>
-          <button onClick="doRedirect()" id="redirect" title="redirect selected channel to <ext> (sip refer)">Redirect</button>
-          Ext:
-          <input id="redirect_ext">
+          <div><button onClick="doRedirect()" id="redirect" title="redirect selected channel to <ext> (sip refer)">Redirect</button></div>
+          <div><label for="redirect_ext">Ext:</label></div>
+          <div><input id="redirect_ext"></div>
         </li>
         <li>
-          <button onClick="doContinueInDialplan()" id="continue" title="make the selected channel exit from stasis app and continue to <context> <ext>">To Dialplan</button>
-          Context:
-          <input id="dp_context">
-          Ext:
-          <input id="dp_ext">
+          <div><button onClick="doContinueInDialplan()" id="continue" title="make the selected channel exit from stasis app and continue to <context> <ext>">To Dialplan</button></div>
+          <div><label for="dp_context">Context:</label></div>
+          <div><input id="dp_context"></div>
+          <div><label for="dp_ext">Ext:</label></div>
+          <div><input id="dp_ext"></div>
         </li>
       </ul>
     </div>
-  
-  </div>    
+
+  </div>
 
   <div id="bridgecmdsbox" class="cmdsbox">
-    
+
     <div class="sectiontitle">
     Bridges
     </div>
-    
+
     <div class="tablebox">
       <table id="bridgelist" class="table" border="1" width=600>
         <tr><th>Id</th><th>Technology</th><th>Type</th><th>Channels</th></tr>
       </table>
     </div>
 
-    <div class="cmds">      
+    <div class="cmds" class="gridalign">
       <ul>
         <li>
-          <button onClick="doCreateBridge()" id="createbridge">Create</button>
-          Type:
+          <div><button onClick="doCreateBridge()" id="createbridge">Create</button></div>
+          <div><label for="bridgetype">Type:</label></div>
+          <div>
             <select id="bridgetype" name="bridgetype">
               <option value="mixing" selected="selected">mixing</option>
               <option value="holding">holding</option>
             </select>
-          <label for="dtmfev">dtmf events</label><input type="checkbox" name="bridgeatt" value=",dtmf_events" id="dtmfev"/>
-          <label for="proxym">proxy media</label><input type="checkbox" name="bridgeatt" value=",proxy_media" id="proxym"/>
+          </div>
+          <div><label for="dtmfev">dtmf events</label></div>
+          <div><input type="checkbox" name="bridgeatt" value=",dtmf_events" id="dtmfev"/></div>
+          <div><label for="proxym">proxy media</label></div>
+          <div><input type="checkbox" name="bridgeatt" value=",proxy_media" id="proxym"/></div>
         </li>
-        <li><button onClick="doDeleteBridge()" id="deletebridge">Delete</button></li>
+        <li><div><button onClick="doDeleteBridge()" id="deletebridge">Delete</button></div></li>
         <li>
-          <button onClick="doAddChToBridge()" id="addchtobridge">Add Channel</button>
-          Role:
-          <select id="chrole" name="chrole">
-            <option value="partecipant" selected="selected">partecipant</option>
-            <option value="announcer">announcer</option>
-          </select>
+          <div><button onClick="doAddChToBridge()" id="addchtobridge">Add Channel</button></div>
+          <div><label for="chrole">Role:</label></div>
+          <div>
+            <select id="chrole" name="chrole">
+              <option value="partecipant" selected="selected">partecipant</option>
+              <option value="announcer">announcer</option>
+            </select>
+          </div>
         </li>
-        <li><button onClick="doRemoveChFromBridge()" id="removechfrombridge">Remove channel</button></li>
-        <li><button onClick="doMohBridge()" id="addmohtobridge">Moh</button></li>
-        <li><button onClick="doStopMohBridge()" id="stopmohfrombridge">Stop Moh</button></li>
+        <li><div><button onClick="doRemoveChFromBridge()" id="removechfrombridge">Remove channel</button></div></li>
+        <li><div><button onClick="doMohBridge()" id="addmohtobridge">Moh</button></div></li>
+        <li><div><button onClick="doStopMohBridge()" id="stopmohfrombridge">Stop Moh</button></div></li>
       </ul>
     </div>
-        
+
   </div>
-  
+
   <div id="devicebox" class="cmdsbox">
-  
+
     <div class="sectiontitle">
     Devices
     </div>
-    
+
     <div class="tablebox">
       <table id="devicelist" border="1" width=305>
         <tr><th>Name</th><th>State</th></tr>
@@ -857,6 +947,51 @@ function doSendMessage() {
   </div>
 
   <footer>Copyright (C) Daniele Pallastrelli</footer>
+
+  <!-- dialogs -->
+
+  <div id="optionsDialog" class="modalDialog">
+    <div class="gridalign">
+      <a href="#close" title="Close" class="close">X</a>
+      <h2>Options</h2>
+      <p>This is a sample modal box that can be created using the powers of CSS3.</p>
+      <p>You could do a lot of things here like have a pop-up ad that shows when your website loads, or create a login/register form for users.</p>
+
+      <ul>
+        <li>
+          <div><input type="checkbox" value=",dtmf_events" id="showevents"/></div>
+          <div><label for="showevents">show events</label></div>
+        </li>
+        <li>
+          <div><input type="checkbox" value=",dtmf_events" id="dtmfev"/></div>
+          <div><label for="dtmfev">show events</label></div>
+        </li>
+        <li>
+          <div>
+            <select id="evnum">
+              <option value="50" selected="selected">50</option>
+              <option value="100">100</option>
+              <option value="-1">all</option>
+            </select>
+          </div>
+          <div><label for="evnum">events num</label></div>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div id="aboutDialog" class="modalDialog">
+    <div>
+      <a href="#close" title="Close" class="close">X</a>
+      <h2>Asterisk&trade; ARI Tester version 0.1.0</h2>
+      <p>Copyright (C) Daniele Pallastrelli.</p>
+      <p>Visit the page of this project at 
+      <a href="http://github.com/daniele77/aritester" target="_blank">github</a>
+      or contact me on twitter at 
+      <a href="http://www.twitter.com/DPallastrelli" target="_blank">@DPallastrelli</a></p>
+      <p><a href="http://github.com/daniele77/aritester" target="_blank">Check for updates...</a></p>
+    </div>
+  </div>
 
 </div>
 
