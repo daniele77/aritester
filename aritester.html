@@ -31,16 +31,28 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 <style>
 
-
-body {
-  /*background: #eeeeee;*/
-  font-family: "Trebuchet MS", Verdana, Arial, serif;
+html, body {
+    margin:0px;
+    padding:0px;
+    border:0px;
+    height: 100%;
+    width:100%;
 }
-/*
- a {
-   text-decoration:none;
- }
- */
+
+/* fonts */
+body { font-family: 'Open Sans', sans-serif; }
+
+h1 {
+    font-size:25px;
+    line-height:1.3em;
+}
+
+h2 {
+    font-size:18px;
+    font-weight:600;
+    color:#666;
+    line-height:1.3em;
+}
 
 .flex-container {
   display: -webkit-flex;
@@ -52,7 +64,7 @@ body {
 }
 
 .flex-container > * {
-//  padding: 15px;
+/*  padding: 15px;*/
   -webkit-flex: 1 100%;
   flex: 1 100%;
 }
@@ -63,8 +75,12 @@ body {
 }
 */
 
-header {background: black; color: white; padding-left: 15px;}
-footer {background: #aaa; color: white; padding-left: 15px;}
+header, footer {
+    padding:20px 40px;
+    background-color:#222;
+    color:#fff;
+}
+
 .loginbox {background: #eee;}
 
 .loginbox {
@@ -74,8 +90,8 @@ footer {background: #aaa; color: white; padding-left: 15px;}
   height: 310px;
 }
 .descriptionbox {
-//  order: 1;
-//  flex: 0 0 auto;
+/*  order: 1;
+  flex: 0 0 auto;*/
   text-align: left;
   font-style: italic;
   width: 250px;
@@ -110,24 +126,25 @@ footer {background: #aaa; color: white; padding-left: 15px;}
 }
 #eventbox {
   order: 6;
-  //flex: 1 0 auto;
+  /*flex: 1 0 auto;*/
 
   height: 200px;
   border-top: 1px solid #eee;
   border-left: 1px solid #eee;
   border-bottom: 1px solid #eee;
   border-right: 1px solid #eee;
-  //padding: 10px; 
+  /*padding: 10px; */
   font-size: 80%;
   overflow: auto;
   background-color: white;
-  margin: 20px 0px 20px 0px;
+  /*margin: 20px 0px 20px 0px;*/
+  margin: 0px 5px 10px 5px;
 }
 #eventbox ul {
   list-style: none;
-  //margin-left: 0;
+  /*margin-left: 0;*/
   padding-left: 2px;
-  //width: 10em;
+  /*width: 10em;*/
 }
 footer {
   order: 7;
@@ -140,13 +157,9 @@ footer {
   width: 150px;  
 }
 .cmdsbox button:hover { background: #c1c1c1; }
-.cmdsbox input {
-  width: 100px;
-}
-.cmdsbox select {
-  width: 100px;
-}
-.cmdsbox label { margin-left: 20px; }
+.cmdsbox input { width: 100px; }
+.cmdsbox select { width: 100px; }
+.cmdsbox label { margin-left: 20px; font-size: 90%; }
 .cmdsbox input[type="checkbox"] {
   margin: 0;
   padding: 0;
@@ -155,9 +168,8 @@ footer {
 
 .cmds ul {
   list-style: none;
-  //margin-left: 0;
   padding-left: 0;
-  //width: 10em;
+  margin-bottom: 0;
 }
 
 .sectiontitle {
@@ -179,7 +191,7 @@ table {
 th { background-color: #eee; }
 .tablebox {
   height: 150px;
-  //padding: 15px 0px 15px 0px;
+  /*padding: 15px 0px 15px 0px;*/
   border: 1px solid #ababab;
   overflow: auto;
 }
@@ -799,7 +811,7 @@ function doSendMessage() {
     </div>
 
     <div class="tablebox">
-      <table id="channellist" class="table" border="1" width=601>
+      <table id="channellist" class="table" border="1" width=700>
         <tr><th>Id</th><th>Name</th><th>State</th></tr>
       </table>
     </div>
@@ -933,9 +945,9 @@ function doSendMessage() {
       <ul>
         <li><textarea cols="37" rows="7" id="textmsg"></textarea></li>
         <li>
-          From:
+          <label for="msgfrom">From:</label>
           <input id="msgfrom">
-          To:
+          <label for="msgto">To:</label>
           <input id="msgto">
         </li>
         <li><button onClick="doSendMessage()" id="sendmsg">Send Msg</button></li>
@@ -946,7 +958,7 @@ function doSendMessage() {
     <ul id="events"></ul>
   </div>
 
-  <footer>Copyright (C) Daniele Pallastrelli</footer>
+  <footer>Copyright &copy; Daniele Pallastrelli 2017</footer>
 
   <!-- dialogs -->
 
