@@ -744,6 +744,18 @@ function doStopMohBridge() {
   }
 }
 
+function doRecordBridge() {
+  if ( bridgeTable.selection != null ) {
+    httpSend( 'POST', 'bridges/'+bridgeTable.selection+'/record?name='+bridgeTable.selection+'&format=wav&maxDurationSeconds=60&ifExists=overwrite' );
+  }
+}
+
+function doStopRecordBridge() {
+  if ( bridgeTable.selection != null ) {
+    httpSend( 'POST', 'recordings/live/'+bridgeTable.selection+'/stop' );
+  }
+}
+
 // endpoints functions
 
 function doSendMessage() {
@@ -925,6 +937,8 @@ function doSendMessage() {
         <li><div><button onClick="doRemoveChFromBridge()" id="removechfrombridge">Remove channel</button></div></li>
         <li><div><button onClick="doMohBridge()" id="addmohtobridge">Moh</button></div></li>
         <li><div><button onClick="doStopMohBridge()" id="stopmohfrombridge">Stop Moh</button></div></li>
+        <li><div><button onClick="doRecordBridge()" id="recordbridge">Record</button></div></li>
+        <li><div><button onClick="doStopRecordBridge()" id="stoprecordbridge">Stop Record</button></div></li>
       </ul>
     </div>
 
