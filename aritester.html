@@ -431,12 +431,14 @@ function updateDeviceView( device_state ) {
 // ari functions
 
 // http request
-function httpSend(act,cmd) {
+function httpSend(act,cmd, body) {
   var req = new XMLHttpRequest();
   var url = "http://"+tester.ip+"/ari/"+cmd;
   console.log( "requesting: " + act + " " + url );
   append( act + " " + url, "requestmsg" );
   req.open( act, url, true, tester.user, tester.psw );
+  if (body != null)
+    req.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
   req.addEventListener("load", function(){
     console.log( 'http ' + act + ' sent' );
     var statusType = req.status / 100;
@@ -449,7 +451,7 @@ function httpSend(act,cmd) {
     console.log( 'http ' + act + ' error' );
     append( 'http ' + act + ' error', "errormsg" );
   });
-  req.send(null);
+  req.send(body);
 }
 
 // subscribe for all SIP channel events:
@@ -457,7 +459,7 @@ function subscribe() {
   //httpSend( 'POST', 'applications/'+tester.app+'/subscription?eventSource=endpoint:SIP' );
 
   // subscribe for all events from channels,endpoint,bridge and devices source
-  httpSend( 'POST', 'applications/'+tester.app+'/subscription?eventSource=channel:,endpoint:,bridge:,deviceState:' );
+  httpSend( 'POST', 'applications/'+tester.app+'/subscription?eventSource=channel:,endpoint:,bridge:,deviceState:', null );
 }
 
 // find a channel in an event and return a descriptor of the channel
@@ -562,13 +564,13 @@ function doLogoff() {
 
 function getExtension(id) {
   var ext = document.getElementById(id).value;
-  if ( ext.indexOf('/') == -1 ) ext = "sip/"+ext;
+  if ( ext.indexOf('/') == -1 ) ext = "pjsip/"+ext;
   return ext; 
 }
 
 function getTech(id) {
   var ext = document.getElementById(id).value;
-  if ( ext.indexOf(':') == -1 ) ext = "sip:"+ext;
+  if ( ext.indexOf(':') == -1 ) ext = "pjsip:"+ext;
   return ext; 
 }
 
@@ -579,111 +581,113 @@ function getDTMF() {
 
 function doCreateChannel() {
   var ext = getExtension("ext");
-  httpSend( 'POST', 'channels/create?endpoint='+ext+'&app='+tester.app );
+  httpSend( 'POST', 'channels/create?endpoint='+ext+'&app='+tester.app, null );
 }
 
 function doCreateChAndOriginate() {
   var ext = getExtension("createchandoriginate_ext");
-  httpSend( 'POST', 'channels?endpoint='+ext+'&app='+tester.app );
+  var sipHeaders = document.getElementById('sip_header').value;
+  sipHeaders = '{"variables":{'+sipHeaders+'}}';
+  httpSend( 'POST', 'channels?endpoint='+ext+'&app='+tester.app, sipHeaders );
 }
 
 function doDialCh() {
   if ( chTable.selection != null ) {
-    httpSend( 'POST', 'channels/'+chTable.selection+'/dial' );
+    httpSend( 'POST', 'channels/'+chTable.selection+'/dial', null );
   }
 }
 
 function doDTMF() {
   if ( chTable.selection != null ) {
     var dtmf = getDTMF();
-    httpSend( 'POST', 'channels/'+chTable.selection+'/dtmf?dtmf='+dtmf );
+    httpSend( 'POST', 'channels/'+chTable.selection+'/dtmf?dtmf='+dtmf, null );
   }
 }
 
 function doHangup() {
   if ( chTable.selection != null ) {
-    httpSend( 'DELETE', 'channels/'+chTable.selection );
+    httpSend( 'DELETE', 'channels/'+chTable.selection, null );
   }
 }
 
 function doAnswer() {
   if ( chTable.selection != null ) {
-    httpSend( 'POST', 'channels/'+chTable.selection+'/answer' );
+    httpSend( 'POST', 'channels/'+chTable.selection+'/answer', null );
   }
 }
 
 function doRing() {
   if ( chTable.selection != null ) {
-    httpSend( 'POST', 'channels/'+chTable.selection+'/ring' );
+    httpSend( 'POST', 'channels/'+chTable.selection+'/ring', null );
   }
 }
 
 function doStopRing() {
   if ( chTable.selection != null ) {
-    httpSend( 'DELETE', 'channels/'+chTable.selection+'/ring' );
+    httpSend( 'DELETE', 'channels/'+chTable.selection+'/ring', null );
   }
 }
 
 function doMute() {
   var direction = document.getElementById("mutedirection").value;
   if ( chTable.selection != null ) {
-    httpSend( 'POST', 'channels/'+chTable.selection+'/mute?direction='+direction );
+    httpSend( 'POST', 'channels/'+chTable.selection+'/mute?direction='+direction, null );
   }
 }
 
 function doUnMute() {
   var direction = document.getElementById("mutedirection").value;
   if ( chTable.selection != null ) {
-    httpSend( 'DELETE', 'channels/'+chTable.selection+'/mute?direction='+direction );
+    httpSend( 'DELETE', 'channels/'+chTable.selection+'/mute?direction='+direction, null );
   }
 }
 
 function doHold() {
   if ( chTable.selection != null ) {
-    httpSend( 'POST', 'channels/'+chTable.selection+'/hold' );
+    httpSend( 'POST', 'channels/'+chTable.selection+'/hold', null );
   }
 }
 
 function doUnHold() {
   if ( chTable.selection != null ) {
-    httpSend( 'DELETE', 'channels/'+chTable.selection+'/hold' );
+    httpSend( 'DELETE', 'channels/'+chTable.selection+'/hold', null );
   }
 }
 
 function doMoh() {
   if ( chTable.selection != null ) {
-    httpSend( 'POST', 'channels/'+chTable.selection+'/moh' );
+    httpSend( 'POST', 'channels/'+chTable.selection+'/moh', null );
   }
 }
 
 function doEndMoh() {
   if ( chTable.selection != null ) {
-    httpSend( 'DELETE', 'channels/'+chTable.selection+'/moh' );
+    httpSend( 'DELETE', 'channels/'+chTable.selection+'/moh', null );
   }
 }
 
 function doSilence() {
   if ( chTable.selection != null ) {
-    httpSend( 'POST', 'channels/'+chTable.selection+'/silence' );
+    httpSend( 'POST', 'channels/'+chTable.selection+'/silence', null );
   }
 }
 
 function doEndSilence() {
   if ( chTable.selection != null ) {
-    httpSend( 'DELETE', 'channels/'+chTable.selection+'/silence' );
+    httpSend( 'DELETE', 'channels/'+chTable.selection+'/silence', null );
   }
 }
 
 function doSnoop() {
   if ( chTable.selection != null ) {
-    httpSend( 'POST', 'channels/'+chTable.selection+'/snoop?app='+tester.app+'&spy=both' );
+    httpSend( 'POST', 'channels/'+chTable.selection+'/snoop?app='+tester.app+'&spy=both', null );
   }
 }
 
 function doRedirect() {
   var ext = getExtension("redirect_ext");
   if ( chTable.selection != null ) {
-    httpSend( 'POST', 'channels/'+chTable.selection+'/redirect?endpoint='+ext );
+    httpSend( 'POST', 'channels/'+chTable.selection+'/redirect?endpoint='+ext, null );
   }
 }
 
@@ -691,7 +695,7 @@ function doContinueInDialplan() {
   var context = document.getElementById("dp_context").value;
   var ext = document.getElementById("dp_ext").value;
   if ( chTable.selection != null ) {
-    httpSend( 'POST', 'channels/'+chTable.selection+'/continue?context='+context+'&extension='+ext+'&priority=1');
+    httpSend( 'POST', 'channels/'+chTable.selection+'/continue?context='+context+'&extension='+ext+'&priority=1', null);
   }
 }
 
@@ -703,25 +707,25 @@ function doCreateBridge() {
   type += ( att1.checked ? att1.value : "" );
   var att2 = document.getElementById("proxym");  
   type += ( att2.checked ? att2.value : "" );
-  httpSend( 'POST', 'bridges?type='+type );
+  httpSend( 'POST', 'bridges?type='+type, null );
 }
 
 function doDeleteBridge() {
   if ( bridgeTable.selection != null ) {
-    httpSend( 'DELETE', 'bridges/'+bridgeTable.selection );
+    httpSend( 'DELETE', 'bridges/'+bridgeTable.selection, null );
   }
 }
 
 function doAddChToBridge() {
   if ( bridgeTable.selection != null && chTable.selection != null ) {
     var role = document.getElementById("chrole").value;
-    httpSend( 'POST', 'bridges/'+bridgeTable.selection+'/addChannel?channel='+chTable.selection+'&role='+role );
+    httpSend( 'POST', 'bridges/'+bridgeTable.selection+'/addChannel?channel='+chTable.selection+'&role='+role, null );
   }
 }
 
 function doRemoveChFromBridge() {
   if ( bridgeTable.selection != null && chTable.selection != null ) {
-    httpSend( 'POST', 'bridges/'+bridgeTable.selection+'/removeChannel?channel='+chTable.selection );
+    httpSend( 'POST', 'bridges/'+bridgeTable.selection+'/removeChannel?channel='+chTable.selection, null );
   }
 }
 
@@ -729,30 +733,30 @@ function doDial() {
   var from = document.getElementById("from").value;
   var to = document.getElementById("to").value;
   var context = document.getElementById("context").value;
-  httpSend( 'POST', 'channels?endpoint=SIP/'+from+'&extension='+to+"&context="+context+"&callerId="+from );
+  httpSend( 'POST', 'channels?endpoint=SIP/'+from+'&extension='+to+"&context="+context+"&callerId="+from, null );
 }
 
 function doMohBridge() {
   if ( bridgeTable.selection != null ) {
-    httpSend( 'POST', 'bridges/'+bridgeTable.selection+'/moh' );
+    httpSend( 'POST', 'bridges/'+bridgeTable.selection+'/moh', null );
   }
 }
 
 function doStopMohBridge() {
   if ( bridgeTable.selection != null ) {
-    httpSend( 'DELETE', 'bridges/'+bridgeTable.selection+'/moh' );
+    httpSend( 'DELETE', 'bridges/'+bridgeTable.selection+'/moh', null );
   }
 }
 
 function doRecordBridge() {
   if ( bridgeTable.selection != null ) {
-    httpSend( 'POST', 'bridges/'+bridgeTable.selection+'/record?name='+bridgeTable.selection+'&format=wav&maxDurationSeconds=60&ifExists=overwrite' );
+    httpSend( 'POST', 'bridges/'+bridgeTable.selection+'/record?name='+bridgeTable.selection+'&format=wav&maxDurationSeconds=60&ifExists=overwrite', null );
   }
 }
 
 function doStopRecordBridge() {
   if ( bridgeTable.selection != null ) {
-    httpSend( 'POST', 'recordings/live/'+bridgeTable.selection+'/stop' );
+    httpSend( 'POST', 'recordings/live/'+bridgeTable.selection+'/stop', null );
   }
 }
 
@@ -763,7 +767,8 @@ function doSendMessage() {
   httpSend( 'PUT', 
             'endpoints/sendMessage?to='+getTech("msgto")
             +'&from='+getTech("msgto")
-            +'&body='+msg );
+            +'&body='+msg,
+            null );
 }
 
 
@@ -893,6 +898,13 @@ function doSendMessage() {
       </ul>
     </div>
 
+    <br>
+    <div>
+      <label>SIP Invite custom headers (for Create And Dial):</label>
+      <li><textarea cols="80" rows="4" id="sip_header">"PJSIP_HEADER(add,Alert-info)":";answer-after=0",
+"PJSIP_HEADER(add,Alert-info)":"info=alert-autoanswer"</textarea></li>
+    </div>
+
   </div>
 
   <div id="bridgecmdsbox" class="cmdsbox">
@@ -1009,7 +1021,7 @@ function doSendMessage() {
   <div id="aboutDialog" class="modalDialog">
     <div>
       <a href="#close" title="Close" class="close">X</a>
-      <h2>Asterisk&trade; ARI Tester version 0.1.0</h2>
+      <h2>Asterisk&trade; ARI Tester version 0.1.1</h2>
       <p>Copyright (C) Daniele Pallastrelli.</p>
       <p>Visit the page of this project at 
       <a href="http://github.com/daniele77/aritester" target="_blank">github</a>
