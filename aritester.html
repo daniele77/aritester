@@ -593,7 +593,9 @@ function doCreateChAndOriginate() {
 
 function doDialCh() {
   if ( chTable.selection != null ) {
-    httpSend( 'POST', 'channels/'+chTable.selection+'/dial', null );
+    var sipHeaders = document.getElementById('sip_header').value;
+    sipHeaders = '{"variables":{'+sipHeaders+'}}';
+    httpSend( 'POST', 'channels/'+chTable.selection+'/dial', sipHeaders );
   }
 }
 
@@ -900,7 +902,7 @@ function doSendMessage() {
 
     <br>
     <div>
-      <label>SIP Invite custom headers (for Create And Dial):</label>
+      <label>SIP Invite custom headers:</label>
       <li><textarea cols="80" rows="4" id="sip_header">"PJSIP_HEADER(add,Alert-info)":";answer-after=0",
 "PJSIP_HEADER(add,Alert-info)":"info=alert-autoanswer"</textarea></li>
     </div>
@@ -1021,7 +1023,7 @@ function doSendMessage() {
   <div id="aboutDialog" class="modalDialog">
     <div>
       <a href="#close" title="Close" class="close">X</a>
-      <h2>Asterisk&trade; ARI Tester version 0.1.1</h2>
+      <h2>Asterisk&trade; ARI Tester version 0.1.2</h2>
       <p>Copyright (C) Daniele Pallastrelli.</p>
       <p>Visit the page of this project at 
       <a href="http://github.com/daniele77/aritester" target="_blank">github</a>
