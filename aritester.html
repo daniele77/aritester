@@ -701,6 +701,15 @@ function doContinueInDialplan() {
   }
 }
 
+function doSetVariable() {
+  if ( chTable.selection != null ) {
+    const k = document.getElementById("variable_key").value;
+    const v = document.getElementById("variable_value").value;
+    const variable = '{"variable":"' + k + '", "value":"' + v + '"}';
+    httpSend( 'POST', 'channels/'+chTable.selection+'/variable', variable );
+  }
+}
+
 // bridge functions
 
 function doCreateBridge() {
@@ -897,6 +906,13 @@ function doSendMessage() {
           <div><label for="dp_ext">Ext:</label></div>
           <div><input id="dp_ext"></div>
         </li>
+        <li>
+          <div><button onClick="doSetVariable()" id="setvariable" title="Set a variable on the selected channel">Set Variable</button></div>
+          <div><label for="variable_key">Name:</label></div>
+          <div><input id="variable_key"></div>
+          <div><label for="variable_value">Value:</label></div>
+          <div><input id="variable_value"></div>
+        </li>
       </ul>
     </div>
 
@@ -1023,7 +1039,7 @@ function doSendMessage() {
   <div id="aboutDialog" class="modalDialog">
     <div>
       <a href="#close" title="Close" class="close">X</a>
-      <h2>Asterisk&trade; ARI Tester version 0.1.2</h2>
+      <h2>Asterisk&trade; ARI Tester version 0.1.3</h2>
       <p>Copyright (C) Daniele Pallastrelli.</p>
       <p>Visit the page of this project at 
       <a href="http://github.com/daniele77/aritester" target="_blank">github</a>
