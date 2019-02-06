@@ -13,7 +13,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Security
 
 ## [0.1.4] - 2019-02-06
+
 ### Added
 - Channel id in "create channel" action
 - callerid in "create channel and originate" action
 - CHANGELOG.md file
+
+### Changed
+- The Dial appends pjsip/ to the "From" field if a technology has not been specified
