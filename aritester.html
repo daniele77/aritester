@@ -581,14 +581,21 @@ function getDTMF() {
 
 function doCreateChannel() {
   var ext = getExtension("ext");
-  httpSend( 'POST', 'channels/create?endpoint='+ext+'&app='+tester.app, null );
+  var id = document.getElementById("createchid").value; 
+  if (id)
+    httpSend( 'POST', 'channels/create?endpoint='+ext+'&app='+tester.app + '&channelId='+id, null );
+  else
+    httpSend( 'POST', 'channels/create?endpoint='+ext+'&app='+tester.app, null );
 }
 
 function doCreateChAndOriginate() {
   var ext = getExtension("createchandoriginate_ext");
+  var callerId = document.getElementById("createchandoriginate_callerid").value;
   var sipHeaders = document.getElementById('sip_header').value;
   sipHeaders = '{"variables":{'+sipHeaders+'}}';
-  httpSend( 'POST', 'channels?endpoint='+ext+'&app='+tester.app, sipHeaders );
+  var url = 'channels?endpoint='+ext+'&app='+tester.app;
+  if (callerId) url = url + "&callerId="+callerId;
+  httpSend( 'POST', url, sipHeaders );
 }
 
 function doDialCh() {
@@ -741,10 +748,11 @@ function doRemoveChFromBridge() {
 }
 
 function doDial() {
-  var from = document.getElementById("from").value;
+  var from = getExtension("from");
   var to = document.getElementById("to").value;
   var context = document.getElementById("context").value;
-  httpSend( 'POST', 'channels?endpoint=SIP/'+from+'&extension='+to+"&context="+context+"&callerId="+from, null );
+//  httpSend( 'POST', 'channels?endpoint=SIP/'+from+'&extension='+to+"&context="+context+"&callerId="+from, null );
+  httpSend( 'POST', 'channels?endpoint='+from+'&extension='+to+"&context="+context+"&callerId="+from, null );
 }
 
 function doMohBridge() {
@@ -848,13 +856,17 @@ function doSendMessage() {
       <ul>
         <li>
           <div><button onClick="doCreateChannel()" id="createch" title="Create a channel">Create Only</button></div>
-          <div><label for="createch">Ext:</label></div>
+          <div><label for="ext">Ext:</label></div>
           <div><input id="ext"></div>
+          <div><label for="createchid">Id:</label></div>
+          <div><input id="createchid"></div>
         </li>
         <li>
           <div><button onClick="doCreateChAndOriginate()" id="createchorig" title="Create a channel and dial <ext>">Create And Dial</button></div>
-          <div><label for="createchorig">Ext:</label></div>
+          <div><label for="createchandoriginate_ext">Ext:</label></div>
           <div><input id="createchandoriginate_ext"></div>
+          <div><label for="createchandoriginate_callerid">Caller Id:</label></div>
+          <div><input id="createchandoriginate_callerid"></div>
         </li>
         <li>
           <div><button onClick="doDial()" id="dial" title="Create a channel (from) and dial to <context> <to>">Dial</button></div>
@@ -1039,7 +1051,7 @@ function doSendMessage() {
   <div id="aboutDialog" class="modalDialog">
     <div>
       <a href="#close" title="Close" class="close">X</a>
-      <h2>Asterisk&trade; ARI Tester version 0.1.3</h2>
+      <h2>Asterisk&trade; ARI Tester version 0.1.4</h2>
       <p>Copyright (C) Daniele Pallastrelli.</p>
       <p>Visit the page of this project at 
       <a href="http://github.com/daniele77/aritester" target="_blank">github</a>
