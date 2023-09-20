@@ -1,5 +1,13 @@
 <!doctype html>
 
+<html lang="en-US">
+<head>
+
+<meta charset="UTF-8">
+<meta name="description" content="Test Page for Asterisk ARI interface">
+<meta name="author" content="Daniele Pallastrelli">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <!--
 ARI TESTER
 
@@ -23,9 +31,6 @@ OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR 
 OTHER DEALINGS IN THE SOFTWARE.
 -->
-
-<html lang="en-US">
-<head>
 
 <title>ARI Tester</title> 
 
@@ -693,6 +698,29 @@ function doSnoop() {
   }
 }
 
+function doRecord() {
+  if ( chTable.selection != null ) {
+    httpSend( 'POST', 'channels/'+chTable.selection+'/record?name=aritester_recording&format=wav&ifExists=overwrite&terminateOn=none&maxDurationSeconds=60', null );
+  }
+}
+
+function doStopRecord() {
+  if ( chTable.selection != null ) {
+    httpSend( 'POST', 'recordings/live/aritester_recording/stop', null );
+  }
+}
+
+function doPlay() {
+  if ( chTable.selection != null ) {
+    httpSend( 'POST', 'channels/'+chTable.selection+'/play?media=aritester_recording&playbackId=42', null );
+  }
+}
+
+function doStopPlay() {
+  if ( chTable.selection != null ) {
+    httpSend( 'DELETE', 'playbacks/42', null );
+  }
+}
 function doRedirect() {
   var ext = getExtension("redirect_ext");
   if ( chTable.selection != null ) {
@@ -813,11 +841,11 @@ function doSendMessage() {
     <ul>
       <li>
         <div><label for="username">Username:</label></div>
-        <div><input id="username"/></div>
+        <div><input id="username" autocomplete="username"/></div>
       </li>
       <li>
         <div><label for="secret">Secret:</label></div>
-        <div><input type="password" id="secret"/></div>
+        <div><input type="password" id="secret" autocomplete="current-password"/></div>
       </li>
       <li>
         <div><label for="application">Application:</label></div>
@@ -905,6 +933,14 @@ function doSendMessage() {
         <li><div><button onClick="doAnswer()" id="answer">Answer</button></div></li>
         <li><div><button onClick="doHangup()" id="hangup">Hangup</button></div></li>
         <li><div><button onClick="doSnoop()" id="snoop">Snoop</button></div></li>
+        <li>
+          <div><button onClick="doRecord()" id="record">Record</button></div>
+          <div><button onClick="doStopRecord()" id="stoprecord">Stop</button></div>
+        </li>
+        <li>
+          <div><button onClick="doPlay()" id="play">Play</button></div>
+          <div><button onClick="doStopPlay()" id="stopplay">Stop</button></div>
+        </li>
         <li><div><button onClick="doDialCh()" id="dialch">Dial</button></div></li>
         <li>
           <div><button onClick="doRedirect()" id="redirect" title="redirect selected channel to <ext> (sip refer)">Redirect</button></div>
@@ -930,7 +966,7 @@ function doSendMessage() {
 
     <br>
     <div>
-      <label>SIP Invite custom headers:</label>
+      <label for="sip_header">SIP Invite custom headers:</label>
       <li><textarea cols="80" rows="4" id="sip_header">"PJSIP_HEADER(add,Alert-info)":";answer-after=0",
 "PJSIP_HEADER(add,Alert-info)":"info=alert-autoanswer"</textarea></li>
     </div>
@@ -1018,6 +1054,7 @@ function doSendMessage() {
 
   <!-- dialogs -->
 
+  <!-- TODO
   <div id="optionsDialog" class="modalDialog">
     <div class="gridalign">
       <a href="#close" title="Close" class="close">X</a>
@@ -1031,8 +1068,8 @@ function doSendMessage() {
           <div><label for="showevents">show events</label></div>
         </li>
         <li>
-          <div><input type="checkbox" value=",dtmf_events" id="dtmfev"/></div>
-          <div><label for="dtmfev">show events</label></div>
+          <div><input type="checkbox" value=",dtmf_events" id="option2"/></div>
+          <div><label for="option2">show events</label></div>
         </li>
         <li>
           <div>
@@ -1047,11 +1084,12 @@ function doSendMessage() {
       </ul>
     </div>
   </div>
+  -->
 
   <div id="aboutDialog" class="modalDialog">
     <div>
       <a href="#close" title="Close" class="close">X</a>
-      <h2>Asterisk&trade; ARI Tester version 0.1.4</h2>
+      <h2>Asterisk&trade; ARI Tester version 0.1.5</h2>
       <p>Copyright (C) Daniele Pallastrelli.</p>
       <p>Visit the page of this project at 
       <a href="http://github.com/daniele77/aritester" target="_blank">github</a>
