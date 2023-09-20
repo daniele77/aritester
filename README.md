@@ -2,7 +2,7 @@
 Web app to test Asterisk ARI (asterisk REST api)
 
 ## Version
-This is aritester v. 0.1.4
+This is aritester v. 0.1.5
 
 ## Description
 ARI tester is a basic web app userful to test asterisk REST api.
