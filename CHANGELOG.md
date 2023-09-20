@@ -15,12 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.5] - 2023-09-20
 
 ### Added
-- Add record and playback channel buttons
-- Add html head information
-- Fix minor html bugs (duplicated id, autofill fields and so on)
+- Record and playback channel buttons
+- Html head information
 
 ### Changed
-- The Dial appends pjsip/ to the "From" field if a technology has not been specified
+- Fix minor html bugs (duplicated id, autofill fields and so on)
 
 
 ## [0.1.4] - 2019-02-06
